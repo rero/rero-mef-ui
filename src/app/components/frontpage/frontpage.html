@@ -1,0 +1,106 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<section aria-labelledby="entities-title">
+  <h2 id="entities-title" class="mb-6 text-2xl text-heading">Explore the entities</h2>
+  <ul class="grid gap-6 md:grid-cols-3">
+    @for (entity of entities; track entity.key) {
+      <li
+        class="flex flex-col rounded-lg border border-line bg-surface p-6 shadow-sm transition-shadow hover:shadow-md">
+        <div class="mb-4 flex items-start gap-4">
+          <app-entity-icon [category]="entity.key" />
+          <div>
+            <h3 class="mb-0 text-xl font-semibold text-heading">{{ entity.title }}</h3>
+            <p class="text-sm whitespace-nowrap text-ink-muted" aria-live="polite">
+              @if (counts.value()?.[entity.key]; as count) {
+                {{ count | number }} records
+              } @else if (counts.isLoading()) {
+                <span class="inline-block h-4 w-28 animate-pulse rounded bg-line"></span>
+                <span class="sr-only">Loading the number of records</span>
+              }
+            </p>
+          </div>
+        </div>
+        <p class="mb-6 flex-1 text-ink-muted">{{ entity.description }}</p>
+        <div class="flex flex-wrap gap-2">
+          <a pButton routerLink="/mef" [queryParams]="{ entity: entity.key }">
+            Browse<span class="sr-only"> {{ entity.title }}</span>
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+          <a pButton outlined [href]="entity.apiUrl" target="_blank" rel="noopener">
+            API<span class="sr-only"> for {{ entity.title }} (opens in a new window)</span>
+            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+          </a>
+        </div>
+      </li>
+    }
+  </ul>
+</section>
+
+<section aria-labelledby="how-title" class="mt-16 rounded-lg bg-surface-muted px-6 py-10 md:px-10">
+  <div class="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div>
+      <h2 id="how-title" class="mb-2 text-2xl text-heading">How MEF works</h2>
+      <div class="flex flex-wrap items-center gap-2 text-ink-muted">
+        <!-- Visible label only: the list is already named "Sources" for screen readers -->
+        <span aria-hidden="true">Sources:</span>
+        <app-entity-sources [sources]="sources" />
+      </div>
+    </div>
+    <a routerLink="/linking" class="font-medium">
+      Learn how linking works <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+  </div>
+  <ol class="grid gap-8 md:grid-cols-3">
+    @for (step of steps; track step.title; let index = $index) {
+      <li class="flex gap-4">
+        <span
+          class="flex size-10 shrink-0 items-center justify-center rounded-full bg-mef-blue text-white"
+          aria-hidden="true">
+          <i [class]="step.icon"></i>
+        </span>
+        <div>
+          <h3 class="mb-1 text-lg font-semibold text-heading">
+            <span class="sr-only">Step {{ index + 1 }}: </span>{{ step.title }}
+          </h3>
+          <p class="text-ink-muted">{{ step.description }}</p>
+        </div>
+      </li>
+    }
+  </ol>
+</section>
+
+<section aria-labelledby="products-title" class="mt-16">
+  <h2 id="products-title" class="mb-6 text-2xl text-heading">Other RERO+ products</h2>
+  <ul class="grid gap-6 md:grid-cols-2">
+    @for (product of products; track product.url) {
+      <li>
+        <a
+          [href]="product.url"
+          target="_blank"
+          rel="noopener"
+          class="group flex h-full flex-col gap-5 rounded-lg border border-line bg-surface p-6 text-inherit no-underline shadow-sm transition-shadow hover:text-inherit hover:no-underline hover:shadow-md focus-visible:shadow-md sm:flex-row sm:items-center">
+          <span class="flex h-24 w-full shrink-0 items-center justify-center rounded-md bg-surface-muted px-4 sm:w-44">
+            <!-- Dark mode: light monochrome logo, as the colored logo is designed for a light background -->
+            <img
+              [ngSrc]="product.logo"
+              alt=""
+              [width]="product.width"
+              [height]="product.height"
+              class="h-auto max-h-14 w-auto max-w-full dark:opacity-75 dark:brightness-0 dark:invert dark:transition-opacity dark:group-hover:opacity-100" />
+          </span>
+          <span class="flex flex-col gap-1">
+            <span class="text-lg font-semibold text-heading">{{ product.name }}</span>
+            <span class="text-ink-muted">{{ product.description }}</span>
+            <span class="mt-2 font-medium text-link group-hover:underline">
+              {{ product.domain }}
+              <i class="fa-solid fa-up-right-from-square text-xs" aria-hidden="true"></i>
+              <span class="sr-only">(opens in a new window)</span>
+            </span>
+          </span>
+        </a>
+      </li>
+    }
+  </ul>
+</section>

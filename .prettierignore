@@ -1,0 +1,8 @@
+# Generated / vendored files (Prettier also honours .gitignore)
+pnpm-lock.yaml
+.angular
+dist
+coverage
+# Third-party agent skills: kept identical to their source (`pnpm dlx skills update`)
+.claude/skills/angular-developer
+skills-lock.json

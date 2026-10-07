@@ -1,0 +1,141 @@
+/*
+ * SPDX-FileCopyrightText: Fondation RERO+
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+@import 'tailwindcss';
+
+@plugin "tailwindcss-primeui";
+
+/* Dark mode with the `app-dark` class on <html>, the same selector as PrimeNG (`darkModeSelector`
+   in app.config.ts): `dark:` utilities and PrimeNG components switch together. */
+@custom-variant dark (&:where(.app-dark, .app-dark *));
+
+@theme {
+  /* MEF main color (header background, titles, buttons...): `text-mef-blue`, `bg-mef-blue`... */
+  --color-mef-blue: #1a4162;
+
+  /* Semantic colors of the content, switched in dark mode (`.app-dark` below):
+     `bg-surface`, `text-ink-muted`, `border-line`... The header keeps the MEF blue in both modes. */
+  --color-page: #ffffff; /* page background */
+  --color-surface: #ffffff; /* cards, panels */
+  --color-surface-muted: #f4f8fb; /* boxes, table headers, even rows */
+  --color-surface-accent: #e8f1f8; /* icon badges, code, hovered menu items */
+  --color-line: #d5e3ef; /* borders */
+  --color-ink: #333333; /* text */
+  --color-ink-muted: #495057; /* secondary text, labels */
+  --color-ink-subtle: #9ca3af; /* separators of the entity type label */
+  --color-heading: #1a4162; /* titles */
+  --color-link: var(--p-primary-600);
+  --color-link-hover: var(--p-primary-700);
+  --color-danger: var(--color-red-500); /* deleted records */
+  --color-danger-strong: var(--color-red-700); /* error messages */
+  --color-danger-surface: var(--color-red-50);
+
+  /* Same font stack as rero-ils-ui (:root in projects/admin/src/app/scss/styles.scss) */
+  --font-sans:
+    -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Base styles ported from @rero/ng-core (assets/scss/_theme.scss and _typography.scss),
+   without the `ui:` prefix used in rero-ils-ui. Kept in the base layer so that utility
+   classes still win. */
+@layer base {
+  /* Dark mode values of the semantic colors, based on the PrimeNG dark palette (neutral
+     `surface`, `primary`), so that the content matches the PrimeNG components. */
+  .app-dark {
+    color-scheme: dark;
+    --color-page: var(--p-surface-950);
+    --color-surface: var(--p-surface-900);
+    --color-surface-muted: var(--p-surface-800);
+    --color-surface-accent: var(--p-surface-700);
+    --color-line: var(--p-surface-700);
+    --color-ink: var(--p-surface-200);
+    --color-ink-muted: var(--p-surface-400);
+    --color-ink-subtle: var(--p-surface-500);
+    --color-heading: var(--p-primary-300);
+    --color-link: var(--p-primary-400);
+    --color-link-hover: var(--p-primary-300);
+    --color-danger: var(--color-red-400);
+    --color-danger-strong: var(--color-red-300);
+    --color-danger-surface: color-mix(in srgb, var(--color-red-500) 15%, transparent);
+  }
+
+  body {
+    @apply bg-page text-ink;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply mt-0 mb-1 font-medium;
+  }
+  h1 {
+    @apply text-4xl;
+  }
+  h2 {
+    @apply text-3xl;
+  }
+  h3 {
+    @apply text-2xl;
+  }
+  h4 {
+    @apply text-xl;
+  }
+  h5 {
+    @apply text-lg;
+  }
+  h6 {
+    @apply text-base;
+  }
+
+  a:not(.p-button):not(.p-ripple):not([role='button']):not([role='tab']) {
+    color: var(--color-link);
+  }
+
+  a:hover:not(.p-button):not(.p-ripple):not([role='button']):not([role='tab']) {
+    color: var(--color-link-hover);
+    @apply underline;
+  }
+}
+
+/* Header navigation (app-menu): on desktop, items of the bar in white on the header blue. The
+   dropdowns and the mobile panel keep the colors of the Menubar design tokens (semantic colors).
+   Not layered, so that these rules win over the PrimeNG theme (`primeng` layer). */
+app-menu .p-menubar:not(.p-menubar-mobile) .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content {
+  color: #ffffff;
+}
+
+app-menu
+  .p-menubar:not(.p-menubar-mobile)
+  .p-menubar-root-list
+  > .p-menubar-item:is(.p-focus, .p-menubar-item-active)
+  > .p-menubar-item-content,
+app-menu
+  .p-menubar:not(.p-menubar-mobile)
+  .p-menubar-root-list
+  > .p-menubar-item:not(.p-disabled)
+  > .p-menubar-item-content:hover {
+  color: #dbe9f5;
+  background: rgb(255 255 255 / 0.1);
+}
+
+app-menu
+  .p-menubar:not(.p-menubar-mobile)
+  .p-menubar-root-list
+  > .p-menubar-item
+  > .p-menubar-item-content
+  :is(.p-menubar-item-icon, .p-menubar-submenu-icon) {
+  color: inherit;
+}
+
+/* Dark mode: secondary tags (RERO source) one shade lighter, as their default background
+   (`surface.800`) is the one of the boxes (`bg-surface-muted`, e.g. "How MEF works").
+   Not layered, so that these variables win over the PrimeNG theme (`primeng` layer). */
+.app-dark {
+  --p-tag-secondary-background: var(--p-surface-700);
+  --p-tag-secondary-color: var(--p-surface-200);
+}

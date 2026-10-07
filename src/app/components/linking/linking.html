@@ -1,0 +1,497 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<ng-template #chip let-source>
+  @if (source.url) {
+    <a [href]="source.url" target="_blank" rel="noopener" class="chip-link">
+      <p-tag [value]="source.label" [severity]="source.severity" />
+      <span class="sr-only">(opens in a new window)</span>
+    </a>
+  } @else {
+    <p-tag [value]="source.label" [severity]="source.severity" />
+  }
+</ng-template>
+
+<div>
+  <h1 class="mb-3 text-3xl font-semibold text-heading md:text-4xl">How MEF Linking Works</h1>
+  <p class="mb-6! max-w-3xl text-lg leading-relaxed text-ink-muted">
+    MEF (Multilingual Entity File) merges authority records from multiple national library sources into a single unified
+    record per entity. The linking strategy differs by entity type &mdash; agents use VIAF as a central hub, while
+    concepts and places rely on shared identifier codes embedded directly in the source records.
+  </p>
+
+  <nav aria-label="On this page" class="mb-10">
+    <ul class="flex flex-wrap gap-3">
+      @for (section of sections; track section.id) {
+        <li>
+          <a
+            routerLink="."
+            [fragment]="section.id"
+            class="flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 font-medium text-heading no-underline shadow-sm transition-shadow hover:text-heading hover:no-underline hover:shadow-md">
+            <i [class]="section.icon" aria-hidden="true"></i>
+            {{ section.title }}
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Agents -->
+  <section id="agents" class="section" aria-labelledby="agents-title">
+    <div class="section-header">
+      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+      <div>
+        <h2 id="agents-title" class="section-title">Agents</h2>
+        <p class="section-subtitle">Persons &middot; Organisations</p>
+      </div>
+    </div>
+    <div class="section-content">
+      <div>
+        <p>
+          Agent records from
+          <strong><a [href]="sources.gnd.url" target="_blank" rel="noopener">GND</a></strong>
+          (Deutsche Nationalbibliothek),
+          <strong><a [href]="sources.idref.url" target="_blank" rel="noopener">IdRef</a></strong>
+          (Agence bibliographique de l&rsquo;enseignement sup&eacute;rieur), and
+          <strong>RERO</strong> (R&eacute;seau des biblioth&egrave;ques de Suisse occidentale) are linked through
+          <strong><a [href]="sources.viaf.url" target="_blank" rel="noopener">VIAF</a></strong>
+          (Virtual International Authority File) &mdash; an international hub that cross-references authority files from
+          dozens of national libraries.
+        </p>
+        <p>
+          Each source record carries a VIAF source code inside its <code>identifiedBy</code> list. VIAF groups records
+          from different sources that refer to the same person or organisation under a shared cluster. MEF harvests
+          those VIAF clusters and uses the shared <code>viaf_pid</code> to merge the source records into one unified MEF
+          record.
+        </p>
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row">Sources</th>
+              <td>
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.gnd }" />
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.idref }" />
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.rero }" />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Linking hub</th>
+              <td>
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.viaf }" />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">MEF link key</th>
+              <td><code>viaf_pid</code></td>
+            </tr>
+            <tr>
+              <th scope="row">VIAF source codes</th>
+              <td><code>DNB</code> (GND) &middot; <code>FRBNF</code> (IdRef) &middot; <code>RERO</code> (RERO)</td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-container *ngTemplateOutlet="browse; context: { $implicit: 'agents' }" />
+      </div>
+      <figure>
+        <svg viewBox="0 0 500 200" class="diagram" aria-label="Agents linking via VIAF hub" role="img">
+          <defs>
+            <marker id="ag-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L7,3 L0,6 Z" fill="#adb5bd" />
+            </marker>
+            <marker id="ag-arr-v" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L7,3 L0,6 Z" fill="#15803d" />
+            </marker>
+          </defs>
+          <line class="stroke-[#adb5bd]" x1="92" y1="30" x2="184" y2="87" marker-end="url(#ag-arr)" />
+          <line class="stroke-[#adb5bd]" x1="92" y1="100" x2="184" y2="100" marker-end="url(#ag-arr)" />
+          <line class="stroke-[#adb5bd]" x1="92" y1="170" x2="184" y2="113" marker-end="url(#ag-arr)" />
+          <line class="stroke-[#15803d] stroke-2" x1="294" y1="100" x2="375" y2="100" marker-end="url(#ag-arr-v)" />
+          <text class="fill-[#15803d] text-[10px] font-bold" x="334" y="92">viaf_pid</text>
+          <rect class="fill-[#0369a1]" x="18" y="14" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="30">GND</text>
+          <rect class="fill-[#1d4ed8]" x="18" y="84" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="100">IdRef</text>
+          <rect class="fill-[#475569]" x="18" y="154" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="170">RERO</text>
+          <rect class="fill-[#15803d]" x="186" y="72" width="106" height="56" rx="7" />
+          <text class="node-label text-[15px]" x="239" y="94">VIAF</text>
+          <text class="node-note text-[10px]" x="239" y="116">linking hub</text>
+          <rect class="fill-mef-blue" x="377" y="78" width="88" height="44" rx="7" />
+          <text class="node-label text-[14px]" x="421" y="100">MEF</text>
+          <text class="column-label" x="55" y="7">sources</text>
+          <text class="column-label" x="421" y="7">result</text>
+        </svg>
+        <figcaption class="caption">
+          Source records connect to VIAF via their source code in <code>identifiedBy</code>. VIAF clusters matching
+          records under a shared <code>viaf_pid</code>, which MEF uses to build one unified record.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Concepts -->
+  <section id="concepts" class="section" aria-labelledby="concepts-title">
+    <div class="section-header">
+      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+      <div>
+        <h2 id="concepts-title" class="section-title">Concepts</h2>
+        <p class="section-subtitle">Topics &middot; Subjects &middot; Genres</p>
+      </div>
+    </div>
+    <div class="section-content">
+      <div>
+        <p>
+          Concept records from
+          <strong><a [href]="sources.gnd.url" target="_blank" rel="noopener">GND</a></strong> and
+          <strong><a [href]="sources.idref.url" target="_blank" rel="noopener">IdRef</a></strong>
+          are linked through a shared
+          <a [href]="bnfUrl" target="_blank" rel="noopener" class="font-bold">BNF identifier</a>
+          (Biblioth&egrave;que nationale de France). There is no external hub &mdash; the link key is embedded directly
+          in the source records.
+        </p>
+        <p>
+          IdRef concept records carry a <code>FRBNF*</code> number in their <code>identifiedBy</code> list (source
+          <code>BNF</code>). GND concept records carry the same <code>FRBNF*</code> number inside their
+          <code>exactMatch</code> entries. If no <code>exactMatch</code> entry contains a BNF identifier, MEF falls back
+          to <code>closeMatch</code> &mdash; but only when exactly one match is found, to avoid ambiguous links. MEF
+          compares these codes across both sources to find and merge matching records.
+        </p>
+        <p>
+          <strong>RERO</strong> concept records are also included in MEF but do not carry a cross-source identifier, so
+          they are not directly linked to GND or IdRef records.
+        </p>
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row">Sources</th>
+              <td>
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.gnd }" />
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.idref }" />
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.rero }" />
+                <span class="muted text-xs">(RERO not cross-linked)</span>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Linking method</th>
+              <td>BNF association identifier</td>
+            </tr>
+            <tr>
+              <th scope="row">Link key</th>
+              <td><code>FRBNF*</code> number</td>
+            </tr>
+            <tr>
+              <th scope="row">IdRef field</th>
+              <td><code>identifiedBy[source="BNF"].value</code></td>
+            </tr>
+            <tr>
+              <th scope="row">GND field</th>
+              <td>
+                <code>exactMatch[].identifiedBy[source="BNF"].value</code>
+                <div class="muted text-xs">fallback: <code>closeMatch[]</code> when exactly one match</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-container *ngTemplateOutlet="browse; context: { $implicit: 'concepts' }" />
+      </div>
+      <figure>
+        <svg viewBox="0 0 500 170" class="diagram" aria-label="Concepts linking via BNF FRBNF identifier" role="img">
+          <defs>
+            <marker id="co-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L7,3 L0,6 Z" fill="#1a7a5e" />
+            </marker>
+          </defs>
+          <line class="stroke-[#1a7a5e]" x1="92" y1="35" x2="375" y2="72" marker-end="url(#co-arr)" />
+          <line class="stroke-[#1a7a5e]" x1="92" y1="125" x2="375" y2="88" marker-end="url(#co-arr)" />
+          <text class="fill-[#1a7a5e] text-[9px] font-bold" x="234" y="43">FRBNF* in identifiedBy[BNF]</text>
+          <text class="fill-[#1a7a5e] text-[9px] font-bold" x="234" y="124">
+            FRBNF* in exactMatch / closeMatch[BNF]
+          </text>
+          <rect class="fill-[#1d4ed8]" x="18" y="19" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="35">IdRef</text>
+          <rect class="fill-[#0369a1]" x="18" y="109" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="125">GND</text>
+          <rect class="fill-mef-blue" x="377" y="62" width="88" height="44" rx="7" />
+          <text class="node-label text-[14px]" x="421" y="84">MEF</text>
+          <text class="column-label" x="55" y="12">sources</text>
+          <text class="column-label" x="421" y="12">result</text>
+        </svg>
+        <figcaption class="caption">
+          IdRef and GND each embed the same <code>FRBNF*</code> BNF number in different fields. GND uses
+          <code>exactMatch</code> entries, falling back to <code>closeMatch</code> when exactly one is found. MEF
+          matches those codes across sources to link the records.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Places -->
+  <section id="places" class="section" aria-labelledby="places-title">
+    <div class="section-header">
+      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-location-pin"></i></span>
+      <div>
+        <h2 id="places-title" class="section-title">Places</h2>
+        <p class="section-subtitle">Geographic locations</p>
+      </div>
+    </div>
+    <div class="section-content">
+      <div>
+        <p>
+          Place records from
+          <strong><a [href]="sources.gnd.url" target="_blank" rel="noopener">GND</a></strong> and
+          <strong><a [href]="sources.idref.url" target="_blank" rel="noopener">IdRef</a></strong>
+          are linked through the <strong>GND PID</strong>. RERO does not publish place authority data, so there is no
+          RERO source for places.
+        </p>
+        <p>
+          GND place records serve as the anchor: their own <code>pid</code> is the link key. IdRef place records embed
+          the corresponding GND PID (prefixed with <code>(DE-101)</code>) inside their <code>identifiedBy</code> list
+          (source <code>GND</code>, type <code>bf:Nbn</code>). MEF strips the prefix and matches the bare PID to find
+          the corresponding GND record.
+        </p>
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row">Sources</th>
+              <td>
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.gnd }" />
+                <ng-container *ngTemplateOutlet="chip; context: { $implicit: sources.idref }" />
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Linking method</th>
+              <td>GND PID cross-reference</td>
+            </tr>
+            <tr>
+              <th scope="row">GND link key</th>
+              <td>own <code>pid</code> (anchor)</td>
+            </tr>
+            <tr>
+              <th scope="row">IdRef link key</th>
+              <td>
+                <code>identifiedBy[source="GND", type="bf:Nbn"].value</code><br />
+                <span class="muted text-xs">e.g. <code>(DE-101)1234567</code></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-container *ngTemplateOutlet="browse; context: { $implicit: 'places' }" />
+      </div>
+      <figure>
+        <svg viewBox="0 0 500 140" class="diagram" aria-label="Places linking via GND PID" role="img">
+          <defs>
+            <marker id="pl-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L7,3 L0,6 Z" fill="#7b5c1a" />
+            </marker>
+          </defs>
+          <line class="stroke-[#7b5c1a]" x1="92" y1="35" x2="375" y2="66" marker-end="url(#pl-arr)" />
+          <line class="stroke-[#7b5c1a]" x1="92" y1="105" x2="375" y2="80" marker-end="url(#pl-arr)" />
+          <text class="fill-[#7b5c1a] text-[9px] font-bold" x="234" y="39">(DE-101)GND_PID in identifiedBy[GND]</text>
+          <text class="fill-[#7b5c1a] text-[9px] font-bold" x="234" y="106">own pid (anchor)</text>
+          <rect class="fill-[#1d4ed8]" x="18" y="19" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="35">IdRef</text>
+          <rect class="fill-[#0369a1]" x="18" y="89" width="74" height="32" rx="5" />
+          <text class="node-label text-[13px]" x="55" y="105">GND</text>
+          <rect class="fill-mef-blue" x="377" y="54" width="88" height="44" rx="7" />
+          <text class="node-label text-[14px]" x="421" y="76">MEF</text>
+          <text class="column-label" x="55" y="12">sources</text>
+          <text class="column-label" x="421" y="12">result</text>
+        </svg>
+        <figcaption class="caption">
+          GND place records are the anchor. IdRef records carry the matching GND PID (with
+          <code>(DE-101)</code> prefix) in <code>identifiedBy</code>.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Redirects & lifecycle -->
+  <section id="redirects" class="section" aria-labelledby="redirects-title">
+    <div class="section-header">
+      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-shuffle"></i></span>
+      <div>
+        <h2 id="redirects-title" class="section-title">Record redirects &amp; lifecycle</h2>
+        <p class="section-subtitle">How superseded records are tracked</p>
+      </div>
+    </div>
+    <div class="section-content">
+      <div>
+        <p>
+          Source authorities regularly merge or deprecate records. MEF tracks these changes through a
+          <code>relation_pid</code> field on the source record embedded in each MEF record. The type depends on the
+          source:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Source</th>
+              <th scope="col">Type</th>
+              <th scope="col">Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">GND</th>
+              <td><code>redirect_to</code></td>
+              <td>
+                Old GND record (MARC 682 &ldquo;Umlenkung&rdquo;) points to its canonical replacement. The old record
+                has its own MEF entry.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">IdRef</th>
+              <td><code>redirect_from</code></td>
+              <td>
+                Canonical IdRef record (MARC 035 sudoc) records the old SUDOC PID it replaced. The old PID may have no
+                separate MEF entry.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>The <strong>latest</strong> API endpoint resolves any source PID to the current MEF record:</p>
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row">Agents</th>
+              <td><code>/api/agents/mef/latest/&lt;pid_type&gt;:&lt;pid&gt;</code></td>
+            </tr>
+            <tr>
+              <th scope="row">Concepts</th>
+              <td><code>/api/concepts/mef/latest/&lt;pid_type&gt;:&lt;pid&gt;</code></td>
+            </tr>
+            <tr>
+              <th scope="row">Places</th>
+              <td><code>/api/places/mef/latest/&lt;pid_type&gt;:&lt;pid&gt;</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="muted text-[13px]">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+          Example: <code>/api/agents/mef/latest/gnd:069774331</code> follows the <code>redirect_to</code> chain to
+          return the current MEF record.
+        </p>
+      </div>
+      <div class="flex flex-col gap-4">
+        <figure>
+          <svg
+            viewBox="0 0 500 150"
+            class="diagram"
+            aria-label="GND redirect_to: old record points to canonical"
+            role="img">
+            <defs>
+              <marker id="rd-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#adb5bd" />
+              </marker>
+              <marker id="rd-arr-cur" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" class="fill-mef-blue" />
+              </marker>
+              <marker id="rd-arr-lat" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#c9302c" />
+              </marker>
+            </defs>
+            <line class="stroke-[#adb5bd]" x1="112" y1="31" x2="197" y2="31" marker-end="url(#rd-arr)" />
+            <text class="fill-[#888] text-[9px]" x="154" y="23">redirect_to</text>
+            <line class="stroke-mef-blue" x1="302" y1="31" x2="378" y2="31" marker-end="url(#rd-arr-cur)" />
+            <line
+              class="stroke-[#c9302c] [stroke-dasharray:5,3]"
+              x1="63"
+              y1="72"
+              x2="378"
+              y2="72"
+              marker-end="url(#rd-arr-lat)" />
+            <text class="fill-[#c9302c] text-[9px] font-bold" x="200" y="85">
+              /latest/gnd:A → follows redirect_to → current MEF
+            </text>
+            <rect class="fill-[#adb5bd]" x="18" y="14" width="94" height="34" rx="5" />
+            <text class="node-label text-[11px]" x="65" y="25">GND A</text>
+            <text class="node-note text-[8px]" x="65" y="41">redirect_to: B</text>
+            <rect class="fill-[#0369a1]" x="199" y="14" width="103" height="34" rx="5" />
+            <text class="node-label text-[11px]" x="250" y="28">GND B</text>
+            <text class="node-note text-[8px]" x="250" y="44">canonical</text>
+            <rect class="fill-mef-blue" x="380" y="14" width="88" height="34" rx="7" />
+            <text class="node-label text-[14px]" x="424" y="31">MEF</text>
+            <text class="column-label" x="65" y="7">old source</text>
+            <text class="column-label" x="250" y="7">canonical source</text>
+            <text class="column-label" x="424" y="7">result</text>
+          </svg>
+          <figcaption class="caption">
+            GND: old record A carries <code>redirect_to: B</code> and has its own MEF entry.
+            <code>/latest/gnd:A</code> follows the <code>redirect_to</code> chain to reach the canonical MEF record.
+          </figcaption>
+        </figure>
+
+        <figure>
+          <svg
+            viewBox="0 0 500 150"
+            class="diagram"
+            aria-label="IdRef redirect_from: canonical record records old SUDOC PID"
+            role="img">
+            <defs>
+              <marker id="rf-arr" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#adb5bd" />
+              </marker>
+              <marker id="rf-arr-cur" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" class="fill-mef-blue" />
+              </marker>
+              <marker id="rf-arr-lat" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#c9302c" />
+              </marker>
+            </defs>
+            <line
+              class="stroke-[#adb5bd] [stroke-dasharray:3,2]"
+              x1="110"
+              y1="34"
+              x2="196"
+              y2="34"
+              marker-end="url(#rf-arr)" />
+            <text class="fill-[#888] text-[9px]" x="153" y="26">reverse lookup</text>
+            <line class="stroke-mef-blue" x1="303" y1="34" x2="378" y2="34" marker-end="url(#rf-arr-cur)" />
+            <line
+              class="stroke-[#c9302c] [stroke-dasharray:5,3]"
+              x1="63"
+              y1="78"
+              x2="378"
+              y2="78"
+              marker-end="url(#rf-arr-lat)" />
+            <text class="fill-[#c9302c] text-[9px] font-bold" x="200" y="91">
+              /latest/idref:A → reverse lookup → current MEF
+            </text>
+            <rect class="fill-[#adb5bd]" x="18" y="14" width="92" height="40" rx="5" />
+            <text class="node-label text-[11px]" x="64" y="30">IdRef A</text>
+            <text class="node-note text-[8px]" x="64" y="46">old SUDOC pid</text>
+            <rect class="fill-[#1d4ed8]" x="198" y="14" width="105" height="40" rx="5" />
+            <text class="node-label text-[11px]" x="250" y="24">IdRef B</text>
+            <text class="node-note text-[8px]" x="250" y="42">redirect_from: A</text>
+            <rect class="fill-mef-blue" x="380" y="18" width="88" height="32" rx="7" />
+            <text class="node-label text-[14px]" x="424" y="34">MEF</text>
+            <text class="column-label" x="64" y="7">old SUDOC pid</text>
+            <text class="column-label" x="250" y="7">canonical source</text>
+            <text class="column-label" x="424" y="7">result</text>
+          </svg>
+          <figcaption class="caption">
+            IdRef: canonical record B carries <code>redirect_from: A</code>. Old SUDOC PID A may have no separate MEF
+            entry. <code>/latest/idref:A</code> finds B by searching for any record where
+            <code>idref.relation_pid.value = A</code>.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <aside class="mt-10 flex items-start gap-3 rounded-lg bg-surface-muted px-6 py-5 text-ink-muted">
+    <i class="fa-solid fa-circle-info mt-1 text-heading" aria-hidden="true"></i>
+    <p class="mb-0!">
+      In the record detail view, the field used as link key is highlighted with a
+      <p-tag severity="success" value="LINK KEY" />
+      tag.
+    </p>
+  </aside>
+</div>
+
+<ng-template #browse let-entity>
+  <a pButton outlined size="small" routerLink="/mef" [queryParams]="{ entity: entity }">
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    Browse {{ entity }}
+  </a>
+</ng-template>

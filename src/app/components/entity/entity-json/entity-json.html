@@ -1,0 +1,40 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<button
+  type="button"
+  class="cursor-pointer text-link hover:text-link-hover"
+  title="View JSON"
+  aria-haspopup="dialog"
+  (click)="open()">
+  <i class="fa-solid fa-code" aria-hidden="true"></i>
+  <span class="sr-only">View JSON of {{ label() }}</span>
+</button>
+
+<p-dialog
+  [header]="label() + ' – ' + pid()"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [dismissableMask]="true"
+  [maximizable]="true"
+  [style]="{ width: '60rem' }"
+  [breakpoints]="{ '960px': '95vw' }">
+  <div aria-live="polite">
+    @if (record.isLoading()) {
+      <span class="text-ink-muted">
+        <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+        Loading…
+      </span>
+    } @else if (record.error()) {
+      <span class="text-danger-strong">The record could not be loaded.</span>
+    } @else if (record.hasValue()) {
+      <pre
+        class="overflow-auto rounded bg-surface-muted p-3 font-mono text-sm"
+        tabindex="0"
+        aria-label="JSON of the record"
+        >{{ record.value() | json }}</pre>
+    }
+  </div>
+</p-dialog>

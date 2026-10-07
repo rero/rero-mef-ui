@@ -1,0 +1,21 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<p class="mb-0 flex flex-wrap items-center gap-x-1.5 text-xs font-semibold tracking-wide uppercase">
+  <span class="font-bold text-ink">{{ category() }}</span>
+  @if (name(); as name) {
+    <i class="fa-solid fa-chevron-right text-[0.6rem] text-ink-subtle" aria-hidden="true"></i>
+    <span class="sr-only">: </span>
+    <span class="text-ink-muted">{{ name }}</span>
+  }
+  @if (deleted(); as deleted) {
+    <span class="text-ink-subtle" aria-hidden="true">·</span>
+    <span class="text-danger">
+      <span class="sr-only">, </span>Deleted
+      @if (showDeletedDate()) {
+        {{ deleted | date: 'longDate' }}
+      }
+    </span>
+  }
+</p>

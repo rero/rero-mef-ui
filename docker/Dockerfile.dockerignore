@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: Fondation RERO+
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Build context of docker/Dockerfile (project root): files not needed by the build
+.angular
+.claude
+.git
+.github
+.vscode
+dist
+docker
+node_modules
+*.md

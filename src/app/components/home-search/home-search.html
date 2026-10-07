@@ -1,0 +1,21 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<form role="search" [formGroup]="form" (ngSubmit)="search()">
+  <label for="home-search-query" class="sr-only">Search MEF records</label>
+  <p-inputgroup>
+    <input
+      id="home-search-query"
+      pInputText
+      pSize="large"
+      type="search"
+      formControlName="q"
+      placeholder="Search persons, organisations, concepts, places…"
+      autocomplete="off"
+      class="border-white" />
+    <p-inputgroup-addon class="border-0 p-0">
+      <p-button type="submit" size="large" label="Search" icon="fa-solid fa-magnifying-glass" [pt]="buttonPt" />
+    </p-inputgroup-addon>
+  </p-inputgroup>
+</form>

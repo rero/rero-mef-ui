@@ -1,0 +1,44 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<!-- `relative z-20`: the menu dropdowns are displayed above the page content (e.g. the search input) -->
+<header
+  class="relative z-20 bg-linear-to-br from-mef-blue to-[#1f5482] text-white"
+  [class.mb-10]="!large()"
+  [class.mb-12]="large()">
+  <div class="container relative mx-auto flex h-15 items-center justify-between px-4">
+    <!-- On the home page, the MEF logo is displayed in the large part below -->
+    @if (!large()) {
+      <a routerLink="/" aria-label="MEF home">
+        <img ngSrc="images/logo_mef_white.svg" alt="" width="370" height="120" priority class="h-11 w-auto" />
+      </a>
+    }
+    <app-menu class="ml-auto" />
+    <app-theme-switch class="ml-1 shrink-0" />
+  </div>
+
+  @if (large()) {
+    <div class="container mx-auto px-4 pt-6 pb-14">
+      <h1 class="mb-6">
+        <img
+          ngSrc="images/logo_mef_white.svg"
+          alt="MEF – Multilingual Entity File"
+          width="370"
+          height="120"
+          priority
+          class="h-24 w-auto md:h-32" />
+      </h1>
+      <!-- Same width for the description and the search field -->
+      <div class="max-w-3xl">
+        <p class="mb-8 text-lg leading-relaxed text-[#dbe9f5]">
+          MEF is a linked entity hub that aggregates and aligns authority records from VIAF, IdRef, GND, and RERO. It
+          provides a unified, stable identifier for persons, organisations, concepts, and places across multiple source
+          systems — making multilingual metadata reuse seamless for integrated library systems and data pipelines.
+          Records are harvested automatically and kept in sync with their upstream sources.
+        </p>
+        <app-home-search class="block" />
+      </div>
+    </div>
+  }
+</header>

@@ -1,0 +1,9 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<ul class="flex flex-wrap gap-1" aria-label="Sources">
+  @for (source of sources(); track source) {
+    <li><p-tag [severity]="severity[source]" [value]="labels[source]" /></li>
+  }
+</ul>

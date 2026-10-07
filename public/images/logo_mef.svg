@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 370 120" role="img" aria-labelledby="mef-logo-title">
+  <title id="mef-logo-title">MEF – Multilingual Entity File</title>
+  <defs>
+    <marker id="mef-logo-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#1ea1cf"/>
+    </marker>
+  </defs>
+  <!-- Sync arrows: records harvested and kept in sync with their upstream sources -->
+  <g fill="none" stroke="#1ea1cf" stroke-width="3.5" stroke-linecap="round" marker-end="url(#mef-logo-arrow)">
+    <path d="M33.8 12.8A54 54 0 0 1 84.5 11.8"/>
+    <path d="M86.2 107.2A54 54 0 0 1 35.5 108.2"/>
+  </g>
+  <!-- Alignment links from each source to the hub -->
+  <g stroke="#7cc4e4" stroke-width="5" stroke-linecap="round">
+    <line x1="24" y1="24" x2="60" y2="60"/>
+    <line x1="96" y1="24" x2="60" y2="60"/>
+    <line x1="96" y1="96" x2="60" y2="60"/>
+    <line x1="24" y1="96" x2="60" y2="60"/>
+  </g>
+  <!-- The four sources: VIAF, IdRef, GND, RERO -->
+  <g stroke="#ffffff" stroke-width="4">
+    <circle cx="24" cy="24" r="11" fill="#1ea1cf"/>
+    <circle cx="96" cy="24" r="11" fill="#1765a2"/>
+    <circle cx="96" cy="96" r="11" fill="#1ea1cf"/>
+    <circle cx="24" cy="96" r="11" fill="#1765a2"/>
+  </g>
+  <!-- Hub: the unified, stable MEF identifier -->
+  <circle cx="60" cy="60" r="21" fill="#1a4162" stroke="#ffffff" stroke-width="4"/>
+  <circle cx="60" cy="60" r="7.5" fill="#ffffff"/>
+  <!-- Wordmark, drawn as shapes so that it does not depend on the installed fonts -->
+  <g fill="#1a4162" transform="translate(140 18)">
+    <polygon points="0,62 0,0 13,0 31,31 49,0 62,0 62,62 49,62 49,24 31,54 13,24 13,62"/>
+    <path d="M76 0h42v13H89v12h25v12H89v12h29v13H76z"/>
+    <path d="M130 0h42v13h-29v12h25v12h-25v25h-13z"/>
+  </g>
+  <text x="141" y="104" fill="#1765a2" font-family="-apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="15.5" font-weight="500" letter-spacing="0.6">Multilingual Entity File</text>
+</svg>

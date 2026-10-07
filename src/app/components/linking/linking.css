@@ -1,0 +1,119 @@
+/*
+ * SPDX-FileCopyrightText: Fondation RERO+
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+@reference "../../../styles.css";
+
+/* Text content: these selectors only apply to this component (Angular style encapsulation). */
+p {
+  @apply mb-2.5;
+}
+
+code {
+  @apply rounded bg-surface-accent px-1 py-0.5 font-mono text-[90%] text-heading;
+}
+
+/* Reference tables: framed, with a light blue header column, as the home page boxes */
+table {
+  @apply mt-4 mb-5 w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-line text-sm;
+}
+
+th,
+td {
+  @apply border-t border-line px-3 py-2 align-top;
+}
+
+tr:first-child > th,
+tr:first-child > td {
+  @apply border-t-0;
+}
+
+th {
+  @apply bg-surface-muted text-left font-semibold text-heading;
+}
+
+tbody th {
+  @apply w-40;
+}
+
+thead th {
+  @apply border-b border-line;
+}
+
+/* Entity sections: white cards, as the entity cards of the home page */
+.section {
+  @apply mt-8 scroll-mt-6 rounded-lg border border-line bg-surface p-6 shadow-sm md:p-8;
+}
+
+.section-header {
+  @apply mb-6 flex items-center gap-4;
+}
+
+/* Round icon badge, as on the home page */
+.section-icon {
+  @apply flex size-12 shrink-0 items-center justify-center rounded-full bg-surface-accent text-xl text-heading;
+}
+
+.section-title {
+  @apply mb-0 text-2xl font-semibold text-heading;
+}
+
+.section-subtitle {
+  @apply mb-0! text-sm text-ink-muted;
+}
+
+.section-content {
+  @apply grid gap-8 md:grid-cols-2;
+}
+
+/* Diagrams */
+.diagram {
+  @apply block h-auto w-full rounded-lg border border-line bg-surface-muted p-2;
+}
+
+/* Defaults for all diagram texts and lines (SVG presentation attributes moved to CSS).
+   In the base layer, so that utility classes (e.g. `stroke-2`) still override them. */
+@layer base {
+  .diagram text {
+    text-anchor: middle;
+  }
+
+  .diagram line {
+    stroke-width: 1.5px;
+  }
+}
+
+/* Label inside a node box (GND, VIAF, MEF...) */
+/* `translate-y-[.35em]` centres the text vertically on its y (as `dy=".35em"` did) */
+.node-label {
+  @apply translate-y-[.35em] fill-white font-bold;
+}
+
+/* Small text under a node label (e.g. "linking hub") */
+.node-note {
+  fill: rgb(255 255 255 / 0.85);
+}
+
+/* Column title above the nodes ("sources", "result"...) */
+.column-label {
+  @apply fill-[#9bb0c4] text-[9px] italic;
+}
+
+.caption {
+  @apply mt-3 text-center text-sm/normal text-ink-muted;
+}
+
+/* Small grey texts */
+.muted {
+  @apply text-ink-muted;
+}
+
+/* Source tags linked to the source website */
+.chip-link {
+  @apply mr-1 inline-block no-underline hover:opacity-85 hover:no-underline focus:opacity-85;
+}
+
+td > p-tag {
+  @apply mr-1;
+}

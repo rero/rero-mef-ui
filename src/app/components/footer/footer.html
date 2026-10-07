@@ -1,0 +1,33 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<footer class="mt-16 border-t border-line bg-surface-muted text-sm text-ink-muted">
+  <div class="container mx-auto flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between">
+    <a
+      href="https://www.rero.ch"
+      target="_blank"
+      rel="noopener"
+      title="RERO+ website"
+      class="group flex items-center gap-3 text-inherit no-underline">
+      <span>A service of</span>
+      <!-- Dark mode: light monochrome logo, as the colored logo is designed for a light background -->
+      <img
+        ngSrc="images/logo_rero_plus.svg"
+        alt="RERO+"
+        width="61"
+        height="46"
+        class="h-10 w-auto dark:opacity-75 dark:brightness-0 dark:invert dark:transition-opacity dark:group-hover:opacity-100" />
+      <span class="sr-only">(opens in a new window)</span>
+    </a>
+    <ul class="flex flex-wrap gap-x-6 gap-y-1">
+      @for (link of links; track link.url) {
+        <li>
+          <a [href]="link.url" target="_blank" rel="noopener">
+            {{ link.label }}<span class="sr-only"> (opens in a new window)</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+</footer>

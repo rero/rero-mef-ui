@@ -1,0 +1,31 @@
+diff --git a/fesm2022/rero-ng-core.mjs b/fesm2022/rero-ng-core.mjs
+index 96027b5eb623dd47a1e2d6e21f6df8b65d5d6f6b..17d5e23237ff749a34a4082c65b68a88e1f17dad 100644
+--- a/fesm2022/rero-ng-core.mjs
++++ b/fesm2022/rero-ng-core.mjs
+@@ -26,7 +26,6 @@ import * as i1$1 from '@angular/forms';
+ import { FormsModule, ReactiveFormsModule, FormControl, UntypedFormGroup } from '@angular/forms';
+ import { DatePicker } from 'primeng/datepicker';
+ import { InputNumber } from 'primeng/inputnumber';
+-import EasyMDE from 'easymde';
+ import { Textarea } from 'primeng/textarea';
+ import { toSignal, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+ import { Checkbox } from 'primeng/checkbox';
+@@ -2991,7 +2990,9 @@ class MarkdownFieldComponent extends FieldType {
+      * Markdown editor initialization and listen for changes to update the model
+      * value.
+      */
+-    ngAfterViewInit() {
++    async ngAfterViewInit() {
++        // Lazy import: EasyMDE (CodeMirror) needs the DOM as soon as it is loaded
++        const { default: EasyMDE } = await import('easymde');
+         const mde = new EasyMDE({
+             spellChecker: this.props.spellChecker,
+             promptURLs: this.props.promptURLs,
+@@ -8783,7 +8784,6 @@ class RecordSearchResultComponent {
+     updateStatusRouterLink = computed(() => this.updateStatus().routerLink, ...(ngDevMode ? [{ debugName: "updateStatusRouterLink" }] : /* istanbul ignore next */ []));
+     deleteStatusType = computed(() => this.deleteStatus().type, ...(ngDevMode ? [{ debugName: "deleteStatusType" }] : /* istanbul ignore next */ []));
+     constructor() {
+-        this.currentUrl = window.location.href;
+         // Effect to create/update the dynamic component when dependencies change
+         effect(() => {
+             const container = this.container();

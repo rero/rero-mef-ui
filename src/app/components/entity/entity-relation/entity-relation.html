@@ -1,0 +1,43 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<p-accordion (valueChange)="onValueChange($event)">
+  <p-accordion-panel value="relation" [pt]="accordionPt.panel">
+    <p-accordion-header [pt]="accordionPt.header">
+      <span class="flex items-center gap-2">
+        <i [class]="icon().class" [title]="icon().label" aria-hidden="true"></i>
+        <span class="sr-only">{{ icon().label }}</span>
+        {{ pid() }}
+      </span>
+    </p-accordion-header>
+    <p-accordion-content [pt]="accordionPt.content">
+      <div class="border-l-2 border-line pl-3" aria-live="polite">
+        @if (records.isLoading()) {
+          <span class="text-ink-muted">
+            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            Searching…
+          </span>
+        } @else if (records.error()) {
+          <span class="text-danger-strong">The related records could not be loaded.</span>
+        } @else if (records.hasValue()) {
+          @let related = records.value();
+          @if (related.length) {
+            <ul class="flex flex-col">
+              @for (record of related; track record.pid) {
+                <li>
+                  <a [routerLink]="record.link">{{ record.name }}</a>
+                  <span class="text-ink-muted"> (MEF {{ record.pid }})</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="mb-0 text-ink-muted">
+              No MEF record found for <code>{{ query() }}</code>
+            </p>
+          }
+        }
+      </div>
+    </p-accordion-content>
+  </p-accordion-panel>
+</p-accordion>

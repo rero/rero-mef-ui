@@ -1,0 +1,65 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+@let metadata = record().metadata;
+@let deleted = !!metadata.deleted;
+
+<article
+  class="flex items-start gap-4 rounded-lg px-3 pt-3"
+  [class]="deleted ? 'border-l-4 border-red-400 bg-danger-surface pb-3' : 'pb-0'"
+  [attr.aria-labelledby]="titleId()">
+  <app-entity-icon [type]="metadata.type" [deleted]="deleted" />
+
+  <div class="min-w-0 flex-1">
+    <app-entity-type class="mb-0.5" [type]="metadata.type" [deleted]="metadata.deleted" />
+
+    <h3 [id]="titleId()" class="mb-1.5 text-lg leading-snug font-semibold break-words sm:text-xl">
+      @let url = detailUrl();
+      @if (url?.link) {
+        @if (url?.external) {
+          <a [href]="url?.link" class="text-heading hover:underline focus:underline">
+            {{ name() }}
+          </a>
+        } @else {
+          <a [routerLink]="detailLink()" class="text-heading hover:underline focus:underline">
+            {{ name() }}
+          </a>
+        }
+      } @else {
+        {{ name() }}
+      }
+    </h3>
+
+    <dl class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm text-ink">
+      <div class="flex gap-1.5 whitespace-nowrap">
+        <dt class="font-bold text-ink-muted">PID</dt>
+        <dd>{{ metadata.pid }}</dd>
+      </div>
+      @if (metadata.viaf_pid) {
+        <div class="flex gap-1.5 whitespace-nowrap">
+          <dt class="font-bold text-ink-muted">VIAF</dt>
+          <dd>{{ metadata.viaf_pid }}</dd>
+        </div>
+      }
+    </dl>
+    <dl class="flex flex-wrap gap-x-4 gap-y-0.5 text-sm text-ink">
+      <div class="flex gap-1.5 whitespace-nowrap">
+        <dt class="font-bold text-ink-muted">Created</dt>
+        <dd>{{ record().created | date: 'longDate' }}</dd>
+      </div>
+      <div class="flex gap-1.5 whitespace-nowrap">
+        <dt class="font-bold text-ink-muted">Updated</dt>
+        <dd>{{ record().updated | date: 'longDate' }}</dd>
+      </div>
+      @if (deleted) {
+        <div class="flex gap-1.5 font-bold whitespace-nowrap text-danger">
+          <dt>Deleted</dt>
+          <dd>{{ metadata.deleted | date: 'longDate' }}</dd>
+        </div>
+      }
+    </dl>
+
+    <app-entity-sources class="mt-2.5" [sources]="metadata.sources" />
+  </div>
+</article>

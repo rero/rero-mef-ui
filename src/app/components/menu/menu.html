@@ -1,0 +1,13 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<!-- `static`: on mobile, the menu opens under the whole header instead of under the burger button -->
+<p-menubar
+  [model]="items"
+  [dt]="tokens"
+  ariaLabel="Main"
+  class="static text-sm"
+  [autoHide]="true"
+  [autoHideDelay]="200"
+  (mouseenter)="openOnHover()" />

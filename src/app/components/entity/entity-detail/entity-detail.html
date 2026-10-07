@@ -1,0 +1,174 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<!-- Links to the raw API record (new window) and to its JSON (dialog) -->
+<ng-template #recordActions let-url="url" let-index="index" let-pid="pid" let-label="label">
+  <div class="flex items-center gap-3">
+    <a [href]="url" target="_blank" rel="noopener" title="View raw JSON">
+      <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+      <span class="sr-only">Open the {{ label }} record in the API (opens in a new window)</span>
+    </a>
+    <app-entity-json [index]="index" [pid]="pid" [label]="label" />
+  </div>
+</ng-template>
+
+@if (record(); as entity) {
+  @let metadata = entity.metadata;
+  @let deleted = !!metadata.deleted;
+
+  <!-- Header: as the results of the search (entity-brief), in larger -->
+  <div class="mb-8 flex items-start gap-4">
+    <app-entity-icon [type]="metadata.type" [deleted]="deleted" size="lg" />
+    <div class="min-w-0">
+      <app-entity-type class="mb-1" [type]="metadata.type" [deleted]="metadata.deleted" [showDeletedDate]="true" />
+      <h1 class="mb-3 text-3xl leading-tight font-semibold break-words text-heading">
+        {{ name() }}
+      </h1>
+      <app-entity-sources [sources]="metadata.sources" />
+    </div>
+  </div>
+
+  <!-- Main record -->
+  <section aria-labelledby="main-record-title" class="mb-8 rounded-lg border border-line bg-surface shadow-sm">
+    <div class="flex items-center justify-between gap-4 border-b border-line px-5 py-3">
+      <h2 id="main-record-title" class="mb-0 text-lg font-semibold text-heading">Main record</h2>
+      <ng-container
+        *ngTemplateOutlet="
+          recordActions;
+          context: {
+            url: recordUrl('mef', metadata.pid),
+            index: dataType() + '/mef',
+            pid: metadata.pid,
+            label: 'Main record',
+          }
+        " />
+    </div>
+    <dl class="px-5 py-1">
+      <div appEntityField>
+        <span fieldLabel>PID</span>
+        <span fieldValue>{{ metadata.pid }}</span>
+      </div>
+      <div appEntityField>
+        <span fieldLabel>Type</span>
+        <span fieldValue>{{ dataType() }} ({{ metadata.type }})</span>
+      </div>
+      @if (metadata.viaf_pid) {
+        <div appEntityField>
+          <span fieldLabel>VIAF</span>
+          <span fieldValue class="flex flex-col gap-1">
+            <!-- VIAF cluster in the MEF API, used as link key -->
+            <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <a [href]="entity.links.viaf" target="_blank" rel="noopener">
+                {{ metadata.viaf_pid }}
+                <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+                <span class="sr-only">(opens in a new window)</span>
+              </a>
+              <app-entity-json [index]="dataType() + '/viaf'" [pid]="metadata.viaf_pid" label="VIAF" />
+              <p-tag severity="success" value="LINK KEY" />
+            </span>
+            <!-- Same cluster on the VIAF website -->
+            @if (entity.links['viaf.org']; as viafOrgUrl) {
+              <a [href]="viafOrgUrl" target="_blank" rel="noopener" class="self-start">
+                viaf.org
+                <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+                <span class="sr-only">(opens in a new window)</span>
+              </a>
+            }
+          </span>
+        </div>
+      }
+      <div appEntityField>
+        <span fieldLabel>Created</span>
+        <span fieldValue>{{ entity.created | date: 'longDate' }}</span>
+      </div>
+      <div appEntityField>
+        <span fieldLabel>Updated</span>
+        <span fieldValue>{{ entity.updated | date: 'longDate' }}</span>
+      </div>
+      @if (deleted) {
+        <div appEntityField>
+          <span fieldLabel class="text-danger">Deleted</span>
+          <span fieldValue class="font-bold text-danger">
+            {{ metadata.deleted | date: 'longDate' }}
+          </span>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- Sources: one tab per source -->
+  @if (metadata.sources.length) {
+    <section aria-labelledby="sources-title" class="rounded-lg border border-line bg-surface shadow-sm">
+      <h2 id="sources-title" class="mb-0 border-b border-line px-5 py-3 text-lg font-semibold text-heading">Sources</h2>
+      <p-tabs [value]="metadata.sources[0]">
+        <p-tablist>
+          @for (section of sourceSections(); track section.source) {
+            <p-tab [value]="section.source">{{ section.label }}</p-tab>
+          }
+        </p-tablist>
+        <p-tabpanels [pt]="tabPanelsPt">
+          @for (section of sourceSections(); track section.source) {
+            @let source = section.source;
+            <p-tabpanel [value]="source">
+              @if (section.pid; as pid) {
+                <div class="flex justify-end px-5 pt-3">
+                  <ng-container
+                    *ngTemplateOutlet="
+                      recordActions;
+                      context: {
+                        url: recordUrl(source, pid),
+                        index: dataType() + '/' + source,
+                        pid,
+                        label: section.label,
+                      }
+                    " />
+                </div>
+                <dl class="px-5 pb-1">
+                  @for (field of section.fields; track field.key) {
+                    <div appEntityField>
+                      <span fieldLabel [class.text-danger]="field.alert">{{ field.label }}</span>
+                      <span
+                        fieldValue
+                        class="flex flex-col"
+                        [class.font-bold]="field.bold"
+                        [class.text-danger]="field.alert">
+                        @for (value of field.values; track $index) {
+                          @if (value.redirect) {
+                            <app-entity-relation
+                              [entityType]="dataType() ?? ''"
+                              [source]="source"
+                              [pid]="value.text"
+                              [icon]="value.redirect" />
+                          } @else {
+                            <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                              @if (value.url) {
+                                <a [href]="value.url" target="_blank" rel="noopener">
+                                  {{ value.text }}
+                                  <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+                                  <span class="sr-only">(opens in a new window)</span>
+                                </a>
+                              } @else if (field.date) {
+                                <span>{{ value.text | date: 'longDate' }}</span>
+                              } @else {
+                                <span>{{ value.text }}</span>
+                              }
+                              <!-- As the VIAF pid of the main record -->
+                              @if (value.linkKey) {
+                                <p-tag severity="success" value="LINK KEY" />
+                              }
+                            </span>
+                          }
+                        }
+                      </span>
+                    </div>
+                  }
+                </dl>
+              }
+            </p-tabpanel>
+          }
+        </p-tabpanels>
+      </p-tabs>
+    </section>
+  }
+}
