@@ -9,7 +9,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <title>MefUi</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <!-- MEF favicon: SVG for the current browsers (adapted to dark mode), ICO for the older ones,
+       PNG for the iOS home screen -->
+    <link rel="icon" href="favicon.ico" sizes="32x32" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <!-- Applies the color theme before Angular starts, to avoid a flash of the light theme.
        Same storage key and class as ThemeService (src/app/theme.service.ts). -->
     <script>
