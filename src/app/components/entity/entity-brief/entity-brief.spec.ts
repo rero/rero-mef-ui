@@ -51,6 +51,20 @@ describe('EntityBrief', () => {
     expect((fixture.nativeElement as HTMLElement).querySelector('h3')?.textContent?.trim()).toBe('Doe, John');
   });
 
+  it('should link the icon to the detail view, hidden from screen readers and keyboard', async () => {
+    fixture.componentRef.setInput('detailUrl', { link: '/agents/detail/1', external: false });
+    await fixture.whenStable();
+    const element = fixture.nativeElement as HTMLElement;
+    const iconLink = element.querySelector('a:has(> app-entity-icon)');
+    expect(iconLink?.getAttribute('href')).toBe(element.querySelector('h3 a')?.getAttribute('href'));
+    expect(iconLink?.getAttribute('tabindex')).toBe('-1');
+    expect(iconLink?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('should not link the icon without detail view', () => {
+    expect((fixture.nativeElement as HTMLElement).querySelector('a:has(> app-entity-icon)')).toBeNull();
+  });
+
   it('should display the identifiers and the dates as definition lists', () => {
     const terms = [...(fixture.nativeElement as HTMLElement).querySelectorAll('dl dt')].map((term) =>
       term.textContent?.trim(),

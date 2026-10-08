@@ -15,8 +15,8 @@ describe('EntitySources', () => {
     expect(element.querySelector('ul')?.getAttribute('aria-label')).toBe('Sources');
     const tags = [...element.querySelectorAll('li p-tag')];
     expect(tags.map((tag) => tag.textContent?.trim())).toEqual(['IdRef', 'GND', 'RERO']);
-    // GND: `info` severity, RERO: `secondary` (see SOURCE_TAG_SEVERITY)
+    // GND: `info` severity, RERO: `warn` (see SOURCE_TAG_SEVERITY)
     expect(tags[1].classList).toContain('p-tag-info');
-    expect(tags[2].classList).toContain('p-tag-secondary');
+    expect(tags[2].classList).toContain('p-tag-warn');
   });
 });

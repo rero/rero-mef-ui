@@ -1,0 +1,60 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<!-- A node: collapsible object or array, or value; children indented with a guide line -->
+<ng-template #nodeTemplate let-node>
+  @if (node.kind === 'branch') {
+    <details open>
+      <summary class="cursor-pointer list-none rounded [&::-webkit-details-marker]:hidden">
+        <i
+          class="fa-solid fa-caret-right w-4 text-ink-muted transition-transform [details[open]>summary>&]:rotate-90"
+          aria-hidden="true"></i>
+        @if (node.key !== undefined) {
+          <span class="font-semibold text-heading">{{ node.key }}</span
+          >:
+        }
+        {{ node.open }}
+        <!-- Collapsed: closing bracket and number of children -->
+        <span class="hidden [details:not([open])>summary>&]:inline">
+          …{{ node.close }} <span class="text-ink-muted italic">{{ node.size }}</span>
+        </span>
+      </summary>
+      <div class="ml-1.5 border-l border-line pl-2.5">
+        @for (child of node.children; track child.key) {
+          <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: child }" />
+        }
+      </div>
+      <div class="pl-4">{{ node.close }}</div>
+    </details>
+  } @else {
+    <div class="pl-4">
+      @if (node.key !== undefined) {
+        <span class="font-semibold text-heading">{{ node.key }}</span
+        >:
+      }
+      @if (node.url) {
+        <a [href]="node.url" target="_blank" rel="noopener">
+          {{ node.text }}
+          <span class="sr-only">(opens in a new window)</span>
+        </a>
+      } @else {
+        <span [class]="node.type === 'string' ? 'text-ink' : 'text-ink-muted'">{{ node.text }}</span>
+      }
+    </div>
+  }
+</ng-template>
+
+<div class="mb-2 flex flex-wrap gap-2">
+  <p-button label="Expand all" icon="fa-solid fa-angles-down" size="small" [text]="true" (onClick)="setAllOpen(true)" />
+  <p-button
+    label="Collapse all"
+    icon="fa-solid fa-angles-up"
+    size="small"
+    [text]="true"
+    (onClick)="setAllOpen(false)" />
+</div>
+<!-- `relative`: the hidden texts of the links (`sr-only`, absolute) stay in the scrolled area -->
+<div class="relative overflow-auto rounded bg-surface-muted p-3 font-mono text-sm break-words">
+  <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: root() }" />
+</div>

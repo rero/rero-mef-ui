@@ -131,11 +131,3 @@ app-menu
   :is(.p-menubar-item-icon, .p-menubar-submenu-icon) {
   color: inherit;
 }
-
-/* Dark mode: secondary tags (RERO source) one shade lighter, as their default background
-   (`surface.800`) is the one of the boxes (`bg-surface-muted`, e.g. "How MEF works").
-   Not layered, so that these variables win over the PrimeNG theme (`primeng` layer). */
-.app-dark {
-  --p-tag-secondary-background: var(--p-surface-700);
-  --p-tag-secondary-color: var(--p-surface-200);
-}

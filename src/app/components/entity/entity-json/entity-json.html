@@ -30,11 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     } @else if (record.error()) {
       <span class="text-danger-strong">The record could not be loaded.</span>
     } @else if (record.hasValue()) {
-      <pre
-        class="overflow-auto rounded bg-surface-muted p-3 font-mono text-sm"
-        tabindex="0"
-        aria-label="JSON of the record"
-        >{{ record.value() | json }}</pre>
+      <app-json-tree [value]="record.value()" />
     }
   </div>
 </p-dialog>

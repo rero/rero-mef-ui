@@ -6,6 +6,7 @@ import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalE
 import { provideClientHydration, withEventReplay, withNoHttpTransferCache } from '@angular/platform-browser';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideTranslateLoader, provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { definePreset } from '@primeuix/themes';
 import {
   CoreConfigService,
   CoreTranslateLoader,
@@ -23,6 +24,21 @@ import { noCacheInterceptor } from './interceptors/no-cache.interceptor';
 import { responseStatusInterceptor } from './interceptors/response-status.interceptor';
 
 /**
+ * `warn` tags (RERO source) in indigo instead of orange: a third blue, next to the primary blue
+ * (IdRef source, no severity) and the sky blue of `info` (GND source).
+ */
+const preset = definePreset(primeNGConfig.theme?.preset ?? {}, {
+  components: {
+    tag: {
+      colorScheme: {
+        light: { warn: { background: '{indigo.100}', color: '{indigo.700}' } },
+        dark: { warn: { background: 'color-mix(in srgb, {indigo.500}, transparent 84%)', color: '{indigo.300}' } },
+      },
+    },
+  },
+});
+
+/**
  * Dark mode: enabled when the `app-dark` class is set on the `<html>` element. ng-core disables it
  * (`darkModeSelector: false`); the same selector is used by the Tailwind `dark:` variant
  * (`@custom-variant dark` in `styles.css`).
@@ -31,6 +47,7 @@ const primeNGDarkModeConfig = {
   ...primeNGConfig,
   theme: {
     ...primeNGConfig.theme,
+    preset,
     options: { ...primeNGConfig.theme?.options, darkModeSelector: '.app-dark' },
   },
 };

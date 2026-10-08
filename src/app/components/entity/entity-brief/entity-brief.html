@@ -4,18 +4,31 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 @let metadata = record().metadata;
 @let deleted = !!metadata.deleted;
+@let url = detailUrl();
 
 <article
   class="flex items-start gap-4 rounded-lg px-3 pt-3"
   [class]="deleted ? 'border-l-4 border-red-400 bg-danger-surface pb-3' : 'pb-0'"
   [attr.aria-labelledby]="titleId()">
-  <app-entity-icon [type]="metadata.type" [deleted]="deleted" />
+  <!-- Duplicate of the title link, for the mouse only: hidden from screen readers and keyboard. -->
+  @if (url?.link) {
+    @if (url?.external) {
+      <a [href]="url?.link" class="shrink-0" tabindex="-1" aria-hidden="true">
+        <app-entity-icon [type]="metadata.type" [deleted]="deleted" />
+      </a>
+    } @else {
+      <a [routerLink]="detailLink()" class="shrink-0" tabindex="-1" aria-hidden="true">
+        <app-entity-icon [type]="metadata.type" [deleted]="deleted" />
+      </a>
+    }
+  } @else {
+    <app-entity-icon [type]="metadata.type" [deleted]="deleted" />
+  }
 
   <div class="min-w-0 flex-1">
     <app-entity-type class="mb-0.5" [type]="metadata.type" [deleted]="metadata.deleted" />
 
     <h3 [id]="titleId()" class="mb-1.5 text-lg leading-snug font-semibold break-words sm:text-xl">
-      @let url = detailUrl();
       @if (url?.link) {
         @if (url?.external) {
           <a [href]="url?.link" class="text-heading hover:underline focus:underline">

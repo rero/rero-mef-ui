@@ -36,6 +36,13 @@ describe('HomeSearch', () => {
     expect(element.querySelector(`label[for="${input?.id}"]`)?.textContent).toBe('Search MEF records');
   });
 
+  it('should describe the search field with the hint to browse all records', () => {
+    const hintId = element.querySelector('input')?.getAttribute('aria-describedby');
+    expect(element.querySelector(`#${hintId}`)?.textContent?.trim()).toBe(
+      'Leave the field empty and click "Search" to browse all records.',
+    );
+  });
+
   it('should open the MEF search with the trimmed query', async () => {
     await submit('  Goethe ');
     expect(navigate).toHaveBeenLastCalledWith(['/mef'], { queryParams: { q: 'Goethe' } });

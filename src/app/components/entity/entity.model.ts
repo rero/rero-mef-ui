@@ -73,7 +73,7 @@ export const SOURCE_LABELS = {
 export const SOURCE_TAG_SEVERITY = {
   gnd: 'info',
   idref: undefined,
-  rero: 'secondary',
+  rero: 'warn',
   viaf: 'success',
 } as const satisfies Record<AuthoritySource, Tag['severity']>;
 

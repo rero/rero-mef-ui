@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { EntityMetadata } from './entity.model';
-import { entityDetailLink, entityName, entityTypeLabel } from './entity.utils';
+import { entityDetailLink, entityName, entityTypeLabel, sourceColor } from './entity.utils';
 
 describe('entity utils', () => {
   it('entityTypeLabel: should give the main type and the type, not repeated', () => {
@@ -27,5 +27,10 @@ describe('entity utils', () => {
     };
     expect(entityName(metadata)).toBe('Doe, John');
     expect(entityName({ ...metadata, sources: [] })).toBeUndefined();
+  });
+
+  it('sourceColor: should give the text color of the source tag', () => {
+    expect(sourceColor('gnd')).toBe('var(--p-tag-info-color)');
+    expect(sourceColor('idref')).toBe('var(--p-tag-primary-color)');
   });
 });

@@ -43,6 +43,8 @@ const recordTypes: Partial<RecordType>[] = [
         value: 'true',
       },
     ],
+    // Sort direction in the labels, as the icons are not read by screen readers. Without `-`,
+    // ascending: A to Z, oldest first.
     sortOptions: [
       {
         label: 'Relevance',
@@ -52,41 +54,41 @@ const recordTypes: Partial<RecordType>[] = [
         icon: 'fa-solid fa-arrow-down-wide-short',
       },
       {
-        label: 'Authorized access point (newest)',
+        label: 'Authorized access point (A to Z)',
         value: 'authorized_access_point',
-        icon: 'fa-solid fa-arrow-down-wide-short',
+        icon: 'fa-solid fa-arrow-down-a-z',
       },
       {
-        label: 'Date changed (newest)',
+        label: 'Authorized access point (Z to A)',
+        value: '-authorized_access_point',
+        icon: 'fa-solid fa-arrow-up-a-z',
+      },
+      {
+        label: 'Date changed (oldest first)',
         value: 'date_changed',
         defaultNoQuery: true,
-        icon: 'fa-solid fa-arrow-down-wide-short',
+        icon: 'fa-solid fa-arrow-down-short-wide',
       },
       {
-        label: 'Date changed (oldest)',
+        label: 'Date changed (newest first)',
         value: '-date_changed',
         defaultNoQuery: true,
-        icon: 'fa-solid fa-arrow-down-short-wide',
-      },
-      {
-        label: 'Date created (newest)',
-        value: 'date_created',
         icon: 'fa-solid fa-arrow-down-wide-short',
       },
       {
-        label: 'Date created (oldest)',
-        value: '-date_created',
+        label: 'Date created (oldest first)',
+        value: 'date_created',
         icon: 'fa-solid fa-arrow-down-short-wide',
       },
       {
-        label: 'Type',
-        value: 'type',
+        label: 'Date created (newest first)',
+        value: '-date_created',
         icon: 'fa-solid fa-arrow-down-wide-short',
       },
       {
         label: 'PID',
         value: 'pid',
-        icon: 'fa-solid fa-arrow-down-wide-short',
+        icon: 'fa-solid fa-arrow-down-1-9',
       },
     ],
     aggregationsOrder: ['entity', 'source', 'type', 'country_associated', 'creation_date', 'update_date'],

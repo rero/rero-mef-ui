@@ -13,45 +13,9 @@ import { EntityJson } from '../entity-json/entity-json';
 import { EntityRelation } from '../entity-relation/entity-relation';
 import { EntitySources } from '../entity-sources/entity-sources';
 import { EntityTypeLabel } from '../entity-type/entity-type';
-import { ENTITY_TYPES, EntityRecord, EntitySource, EntitySourceName, SOURCE_LABELS } from '../entity.model';
-import { entityName } from '../entity.utils';
-import { FieldValue, fieldValues, humanize } from './field-values';
-
-/** A source field, ready to be displayed. */
-interface SourceField {
-  key: string;
-  /** Readable label, e.g. `Authorized access point`. */
-  label: string;
-  values: FieldValue[];
-  /** In red and bold, as the `Deleted` field of the main record. */
-  alert: boolean;
-  bold: boolean;
-  /** Values displayed with the `longDate` format. */
-  date: boolean;
-}
-
-/** A source of the record (tab of the detail view). */
-interface SourceSection {
-  source: EntitySourceName;
-  /** Official name of the source, e.g. `IdRef`. */
-  label: string;
-  /** Pid of the source record, `undefined` when the source data is missing. */
-  pid?: string;
-  /** Displayed fields, in the API order. */
-  fields: SourceField[];
-}
-
-/** Technical source fields that are not displayed. */
-const HIDDEN_SOURCE_FIELDS = new Set(['$schema', 'md5']);
-
-/** Main source fields, displayed in bold. */
-const HIGHLIGHTED_SOURCE_FIELDS = new Set(['authorized_access_point']);
-
-/** Source fields displayed in red and bold, as the `Deleted` field of the main record. */
-const ALERT_SOURCE_FIELDS = new Set(['deleted']);
-
-/** Source fields which value is a date, displayed with the `longDate` format. */
-const DATE_SOURCE_FIELDS = new Set(['deleted']);
+import { ENTITY_TYPES, EntityRecord, SOURCE_LABELS } from '../entity.model';
+import { entityName, sourceColor } from '../entity.utils';
+import { comparisonLayout, comparisonRows, sourceFields, SourceSection } from './source-fields';
 
 @Component({
   selector: 'app-entity-detail',
@@ -118,31 +82,25 @@ export class EntityDetail {
         source,
         label: SOURCE_LABELS[source],
         pid: data?.pid,
-        fields: data ? this.sourceFields(data) : [],
+        fields: data ? sourceFields(data) : [],
       };
     });
   });
+
+  /** Comparison of the sources, as first tab: only when the record has several sources. */
+  protected readonly comparison = computed(() => {
+    const sections = this.sourceSections();
+    return sections.length > 1 ? comparisonRows(sections) : undefined;
+  });
+
+  /** Widths of the comparison table: same width for each source column. */
+  protected readonly comparisonLayout = computed(() => comparisonLayout(this.sourceSections().length));
+
+  /** Text color of a source, as its tag below the title (entity-sources). */
+  protected readonly sourceColor = sourceColor;
 
   /** Tab panels on the card background, without padding: the fields have their own one. */
   protected readonly tabPanelsPt = {
     root: { class: 'bg-transparent p-0' },
   };
-
-  /** Displayed fields of a source record (technical and empty fields excluded), in the API order. */
-  private sourceFields(data: EntitySource): SourceField[] {
-    return Object.entries(data)
-      .filter(([key]) => !HIDDEN_SOURCE_FIELDS.has(key))
-      .map(([key, value]) => {
-        const alert = ALERT_SOURCE_FIELDS.has(key);
-        return {
-          key,
-          label: humanize(key),
-          values: fieldValues(value),
-          alert,
-          bold: alert || HIGHLIGHTED_SOURCE_FIELDS.has(key),
-          date: DATE_SOURCE_FIELDS.has(key),
-        };
-      })
-      .filter((field) => field.values.length > 0);
-  }
 }

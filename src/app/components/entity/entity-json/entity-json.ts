@@ -1,20 +1,21 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RecordService } from '@rero/ng-core';
 import { Dialog } from 'primeng/dialog';
 
+import { JsonTree } from '../../json-tree/json-tree';
+
 /**
  * Button opening a dialog with the raw JSON of a record, as returned by the API
- * (e.g. `/api/agents/gnd/117023450`), with the `$ref` resolved (`resolve=1`). The record is loaded
- * the first time the dialog is opened.
+ * (e.g. `/api/agents/gnd/117023450`), with the `$ref` resolved (`resolve=1`), as a collapsible
+ * tree. The record is loaded the first time the dialog is opened.
  */
 @Component({
   selector: 'app-entity-json',
-  imports: [Dialog, JsonPipe],
+  imports: [Dialog, JsonTree],
   templateUrl: './entity-json.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

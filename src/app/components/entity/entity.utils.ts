@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ENTITY_TYPES, EntityMetadata, EntityType } from './entity.model';
+import { AuthoritySource, ENTITY_TYPES, EntityMetadata, EntityType, SOURCE_TAG_SEVERITY } from './entity.model';
 
 /**
  * Readable type of an entity: main type and type, e.g. `Agent: Person`, or only the main type when
@@ -23,4 +23,12 @@ export function entityDetailLink({ type, pid }: Pick<EntityMetadata, 'type' | 'p
 /** Name of an entity: `authorized_access_point` of the first source which has one. */
 export function entityName(metadata: EntityMetadata): string | undefined {
   return metadata.sources.map((source) => metadata[source]?.authorized_access_point).find((name) => !!name);
+}
+
+/**
+ * Text color of a source, as the text of its tag (CSS variable of the PrimeNG theme, light and dark
+ * modes), e.g. `var(--p-tag-info-color)` for GND. Sources without severity have the primary color.
+ */
+export function sourceColor(source: AuthoritySource): string {
+  return `var(--p-tag-${SOURCE_TAG_SEVERITY[source] ?? 'primary'}-color)`;
 }

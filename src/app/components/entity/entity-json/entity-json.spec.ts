@@ -38,6 +38,6 @@ describe('EntityJson', () => {
 
     expect(getRecord).toHaveBeenCalledTimes(1);
     expect(getRecord).toHaveBeenCalledWith('agents/gnd', '117023450', { resolve: 1 });
-    expect(document.body.querySelector('pre')?.textContent).toContain('"pid": "117023450"');
+    expect(document.body.querySelector('app-json-tree')?.textContent).toContain('pid: "117023450"');
   });
 });

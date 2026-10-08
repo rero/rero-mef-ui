@@ -13,6 +13,37 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   </div>
 </ng-template>
 
+<!-- Values of a source field: links, dates, redirects and link key -->
+<ng-template #fieldValueList let-values="values" let-date="date" let-source="source">
+  @for (value of values; track $index) {
+    @if (value.redirect) {
+      <app-entity-relation
+        [entityType]="dataType() ?? ''"
+        [source]="source"
+        [pid]="value.text"
+        [icon]="value.redirect" />
+    } @else {
+      <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        @if (value.url) {
+          <a [href]="value.url" target="_blank" rel="noopener">
+            {{ value.text }}
+            <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
+            <span class="sr-only">(opens in a new window)</span>
+          </a>
+        } @else if (date) {
+          <span>{{ value.text | date: 'longDate' }}</span>
+        } @else {
+          <span>{{ value.text }}</span>
+        }
+        <!-- As the VIAF pid of the main record -->
+        @if (value.linkKey) {
+          <p-tag severity="success" value="LINK KEY" />
+        }
+      </span>
+    }
+  }
+</ng-template>
+
 @if (record(); as entity) {
   @let metadata = entity.metadata;
   @let deleted = !!metadata.deleted;
@@ -101,13 +132,84 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   @if (metadata.sources.length) {
     <section aria-labelledby="sources-title" class="rounded-lg border border-line bg-surface shadow-sm">
       <h2 id="sources-title" class="mb-0 border-b border-line px-5 py-3 text-lg font-semibold text-heading">Sources</h2>
-      <p-tabs [value]="metadata.sources[0]">
+      @let comparisonRows = comparison();
+      <p-tabs [value]="comparisonRows ? 'comparison' : metadata.sources[0]">
         <p-tablist>
+          @if (comparisonRows) {
+            <p-tab value="comparison">Compare</p-tab>
+          }
           @for (section of sourceSections(); track section.source) {
             <p-tab [value]="section.source">{{ section.label }}</p-tab>
           }
         </p-tablist>
         <p-tabpanels [pt]="tabPanelsPt">
+          <!-- Comparison: one row per field, one column per source -->
+          @if (comparisonRows) {
+            <p-tabpanel value="comparison">
+              <div
+                class="relative overflow-x-auto px-5 py-3"
+                tabindex="0"
+                role="region"
+                aria-label="Comparison of the sources">
+                @let layout = comparisonLayout();
+                <table
+                  class="w-full table-fixed border-separate border-spacing-0 text-sm"
+                  [style.min-width]="layout.minWidth">
+                  <thead>
+                    <tr>
+                      <th
+                        scope="col"
+                        class="w-52 border-b border-line py-2 pr-6 text-left text-base font-semibold text-ink-muted">
+                        <!-- Hidden: the field names are obvious, but a column header must not be empty -->
+                        <span class="sr-only">Field</span>
+                      </th>
+                      @for (section of sourceSections(); track section.source) {
+                        <th
+                          scope="col"
+                          class="border-b border-line py-2 pr-6 text-left text-base font-semibold"
+                          [style.width]="layout.sourceWidth"
+                          [style.color]="sourceColor(section.source)">
+                          <!-- In the color of the source, as its tag below the title -->
+                          {{ section.label }}
+                        </th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of comparisonRows; track row.key) {
+                      <tr>
+                        <th
+                          scope="row"
+                          class="border-t border-line py-2.5 pr-6 text-left align-top font-semibold text-ink-muted"
+                          [class.text-danger]="row.alert">
+                          {{ row.label }}
+                        </th>
+                        @for (cell of row.cells; track cell.source) {
+                          <td
+                            class="border-t border-line py-2.5 pr-6 align-top break-words"
+                            [class.font-bold]="row.bold"
+                            [class.text-danger]="row.alert">
+                            @if (cell.values.length) {
+                              <span class="flex flex-col">
+                                <ng-container
+                                  *ngTemplateOutlet="
+                                    fieldValueList;
+                                    context: { values: cell.values, date: row.date, source: cell.source }
+                                  " />
+                              </span>
+                            } @else {
+                              <span class="text-ink-subtle" aria-hidden="true">—</span>
+                              <span class="sr-only">No value</span>
+                            }
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </p-tabpanel>
+          }
           @for (section of sourceSections(); track section.source) {
             @let source = section.source;
             <p-tabpanel [value]="source">
@@ -133,33 +235,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                         class="flex flex-col"
                         [class.font-bold]="field.bold"
                         [class.text-danger]="field.alert">
-                        @for (value of field.values; track $index) {
-                          @if (value.redirect) {
-                            <app-entity-relation
-                              [entityType]="dataType() ?? ''"
-                              [source]="source"
-                              [pid]="value.text"
-                              [icon]="value.redirect" />
-                          } @else {
-                            <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
-                              @if (value.url) {
-                                <a [href]="value.url" target="_blank" rel="noopener">
-                                  {{ value.text }}
-                                  <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-                                  <span class="sr-only">(opens in a new window)</span>
-                                </a>
-                              } @else if (field.date) {
-                                <span>{{ value.text | date: 'longDate' }}</span>
-                              } @else {
-                                <span>{{ value.text }}</span>
-                              }
-                              <!-- As the VIAF pid of the main record -->
-                              @if (value.linkKey) {
-                                <p-tag severity="success" value="LINK KEY" />
-                              }
-                            </span>
-                          }
-                        }
+                        <ng-container
+                          *ngTemplateOutlet="
+                            fieldValueList;
+                            context: { values: field.values, date: field.date, source }
+                          " />
                       </span>
                     </div>
                   }

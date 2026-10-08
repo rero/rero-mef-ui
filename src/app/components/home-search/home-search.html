@@ -13,9 +13,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
       formControlName="q"
       placeholder="Search persons, organisations, concepts, places…"
       autocomplete="off"
+      aria-describedby="home-search-hint"
       class="border-white" />
     <p-inputgroup-addon class="border-0 p-0">
       <p-button type="submit" size="large" label="Search" icon="fa-solid fa-magnifying-glass" [pt]="buttonPt" />
     </p-inputgroup-addon>
   </p-inputgroup>
+  <p id="home-search-hint" class="mt-2 text-sm text-[#dbe9f5]">
+    Leave the field empty and click "Search" to browse all records.
+  </p>
 </form>
