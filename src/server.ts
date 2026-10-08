@@ -15,7 +15,16 @@ import { RuntimeConfig } from './app/runtime-config';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+/**
+ * Proxy headers sent by the reverse proxies (nginx, load balancer), trusted to render the pages. Angular trusts only
+ * `X-Forwarded-Host` and `X-Forwarded-Proto` by default: with any other `X-Forwarded-*` header (e.g.
+ * `X-Forwarded-For`), it skips the server rendering and sends the empty page shell, without the runtime
+ * configuration (`API_URL`). Not `true`: the headers the proxies don't send (`X-Forwarded-Port`,
+ * `X-Forwarded-Prefix`) stay ignored.
+ */
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto'],
+});
 
 /**
  * Runtime configuration of the application, from the environment variables: the same build runs on

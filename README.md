@@ -165,6 +165,11 @@ results and the detail views, then hydrated in the browser.
   `NG_ALLOWED_HOSTS` environment variable (comma separated); `pnpm serve:ssr:local` allows `localhost`, to
   check the server rendering of the production build locally. The browser calls of this build go to
   `https://mef.rero.ch` and are blocked by CORS (new search, facets...): use `pnpm start` to test the application.
+- **Proxy headers** (`server.ts`): the server trusts the `X-Forwarded-For`, `X-Forwarded-Host` and
+  `X-Forwarded-Proto` headers of the reverse proxies (`trustProxyHeaders`). With any other `X-Forwarded-*` header,
+  Angular skips the server rendering and sends the empty page shell, without the runtime configuration: the browser
+  then calls `https://mef.rero.ch`, blocked by CORS on the other hosts. The reverse proxies must replace these
+  headers, not append to the values sent by the client.
 - **Deployment**: `pnpm build` generates the browser files (`dist/mef-ui/browser`) and the server
   (`dist/mef-ui/server/server.mjs`), run with Node.js 24 (`PORT` environment variable, 4000 by default; `API_URL`,
   see [Configuration](#configuration)).
@@ -192,7 +197,8 @@ The configuration is passed with environment variables, the same image runs on t
 | `PORT`             | `4000`                | Listening port of the server                                         |
 
 The `Host` header of the requests must be an allowed host name, otherwise the server answers `400`: the reverse
-proxy must pass on the original `Host`. The health check requests a static file (`/favicon.ico`), without
+proxy must pass on the original `Host`. It may send `X-Forwarded-For`, `X-Forwarded-Host` (an allowed host name)
+and `X-Forwarded-Proto`, but no other `X-Forwarded-*` header (see [Server-side rendering](#server-side-rendering)). The health check requests a static file (`/favicon.ico`), without
 rendering nor API call. The build context is filtered by `docker/Dockerfile.dockerignore`.
 
 To test the image locally, allow `localhost`:
