@@ -26,7 +26,12 @@
   </g>
   <!-- Hub: the unified, stable MEF identifier -->
   <circle cx="60" cy="60" r="21" fill="#ffffff" stroke="#1a4162" stroke-width="4"/>
-  <circle cx="60" cy="60" r="7.5" fill="#1a4162"/>
+  <!-- Three points: the entity merged from the source records -->
+  <g fill="#1a4162">
+    <circle cx="60" cy="52.5" r="3.6"/>
+    <circle cx="66.5" cy="63.75" r="3.6"/>
+    <circle cx="53.5" cy="63.75" r="3.6"/>
+  </g>
   <!-- Wordmark, drawn as shapes so that it does not depend on the installed fonts -->
   <g fill="#ffffff" transform="translate(140 18)">
     <polygon points="0,62 0,0 13,0 31,31 49,0 62,0 62,62 49,62 49,24 31,54 13,24 13,62"/>

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 112 112">
   <!-- Favicon: MEF mark (images/logo_mef_mark.svg) simplified to stay readable at 16px:
-       no sync arrows, thicker links, larger sources and hub -->
+       no sync arrows, thicker links, larger sources, hub and points -->
   <style>
     .hub { fill: #1a4162; }
     /* Dark browser UI: lighter hub, the MEF blue being too dark on a dark tab */
@@ -18,5 +18,10 @@
   <circle cx="22" cy="98" r="17" fill="#1765a2"/>
   <!-- Hub: the unified, stable MEF identifier -->
   <circle class="hub" cx="60" cy="60" r="27"/>
-  <circle class="core" cx="60" cy="60" r="10" fill="#ffffff"/>
+  <!-- Three points: the entity merged from the source records -->
+  <g class="core" fill="#ffffff">
+    <circle cx="60" cy="50" r="5"/>
+    <circle cx="68.66" cy="65" r="5"/>
+    <circle cx="51.34" cy="65" r="5"/>
+  </g>
 </svg>
