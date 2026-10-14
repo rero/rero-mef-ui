@@ -131,3 +131,11 @@ app-menu
   :is(.p-menubar-item-icon, .p-menubar-submenu-icon) {
   color: inherit;
 }
+
+app-menu .p-menubar:not(.p-menubar-mobile) .p-menubar-root-list > .p-menubar-item {
+  position: relative;
+}
+
+app-menu .p-menubar:not(.p-menubar-mobile) .p-menubar-root-list > .p-menubar-item > .p-menubar-submenu {
+  inset-inline-end: 0;
+}
