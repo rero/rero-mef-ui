@@ -169,7 +169,7 @@ export const routes: Routes = [
     title: 'Page not found',
     data: {
       status: 404,
-      description: 'The page you are looking for does not exist.',
+      title: 'Page not found',
     },
   },
 ];

@@ -3,10 +3,11 @@
 
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { ApiService } from '@rero/ng-core';
+import { ApiService, DetailComponent } from '@rero/ng-core';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { Tag } from 'primeng/tag';
 
+import { Error } from '../../error/error';
 import { EntityField } from '../entity-field/entity-field';
 import { EntityIcon } from '../entity-icon/entity-icon';
 import { EntityJson } from '../entity-json/entity-json';
@@ -20,6 +21,7 @@ import { comparisonLayout, comparisonRows, sourceFields, SourceSection } from '.
 @Component({
   selector: 'app-entity-detail',
   imports: [
+    Error,
     EntityField,
     EntityIcon,
     EntityJson,
@@ -40,6 +42,8 @@ import { comparisonLayout, comparisonRows, sourceFields, SourceSection } from '.
 })
 export class EntityDetail {
   private readonly apiService = inject(ApiService);
+  /** ng-core's detail view, which creates this component: absent in the tests. */
+  private readonly detail = inject(DetailComponent, { optional: true });
 
   /**
    * Record loaded by ng-core's DetailComponent. `undefined` while it is loading:
@@ -48,6 +52,12 @@ export class EntityDetail {
   readonly record = input<EntityRecord>();
   /** Record type key (e.g. `agents`): bound by ng-core (`DetailRecord`), not used. */
   readonly type = input.required<string>();
+
+  /**
+   * HTTP status of the failed record request, displayed instead of ng-core's error (hidden in
+   * `styles.css`) with the design of the error page.
+   */
+  protected readonly errorStatus = computed(() => this.detail?.error()?.status);
 
   /** Name of the entity, from its first source. */
   readonly name = computed(() => {

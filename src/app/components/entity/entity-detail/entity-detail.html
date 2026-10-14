@@ -44,7 +44,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   }
 </ng-template>
 
-@if (record(); as entity) {
+<!-- `!== undefined`: status `0` (no response from the server) is an error too -->
+@let status = errorStatus();
+@if (status !== undefined) {
+  <app-error [status]="status" />
+} @else if (record(); as entity) {
   @let metadata = entity.metadata;
   @let deleted = !!metadata.deleted;
 

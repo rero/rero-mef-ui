@@ -4,7 +4,7 @@
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideClientHydration, withEventReplay, withNoHttpTransferCache } from '@angular/platform-browser';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideTranslateLoader, provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { definePreset } from '@primeuix/themes';
 import {
@@ -13,6 +13,7 @@ import {
   NgCoreTranslateService,
   primeNGConfig,
   provideCore,
+  RecordHandleErrorService,
 } from '@rero/ng-core';
 import { providePrimeNG } from 'primeng/config';
 
@@ -22,6 +23,7 @@ import { apiTransferCacheInterceptor } from './interceptors/api-transfer-cache.i
 import { dateRangeAggregationInterceptor } from './interceptors/date-range-aggregation.interceptor';
 import { noCacheInterceptor } from './interceptors/no-cache.interceptor';
 import { responseStatusInterceptor } from './interceptors/response-status.interceptor';
+import { AppRecordHandleErrorService } from './record-handle-error.service';
 
 /**
  * `warn` tags (RERO source) in indigo instead of orange: a third blue, next to the primary blue
@@ -56,6 +58,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideCore(),
     { provide: CoreConfigService, useExisting: AppConfigService },
+    { provide: RecordHandleErrorService, useExisting: AppRecordHandleErrorService },
     provideTranslateService({ loader: provideTranslateLoader(CoreTranslateLoader) }),
     { provide: TranslateService, useExisting: NgCoreTranslateService },
     provideAppInitializer(() => inject(NgCoreTranslateService).use(inject(CoreConfigService).defaultLanguage)),
@@ -71,9 +74,14 @@ export const appConfig: ApplicationConfig = {
     ),
     providePrimeNG(primeNGDarkModeConfig),
     provideBrowserGlobalErrorListeners(),
+    // `withComponentInputBinding()`: route data bound to the inputs (e.g. `status` of the error page);
     // `anchorScrolling`: scrolls to the fragment (e.g. /linking#places, "On this page" links);
     // `scrollPositionRestoration`: top of the page on navigation, previous position on back.
-    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' })),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
+    ),
     // HTTP transfer cache of Angular replaced by `apiTransferCacheInterceptor`
     provideClientHydration(withEventReplay(), withNoHttpTransferCache()),
   ],
