@@ -1,13 +1,14 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ActivatedRouteSnapshot, Route, Routes, UrlSegment } from '@angular/router';
+import { inject } from '@angular/core';
+import { ActivatedRouteSnapshot, Route, Router, Routes, UrlSegment } from '@angular/router';
 import { Bucket, DetailComponent, RecordSearchPageComponent, RecordType, typeResolver } from '@rero/ng-core';
 import { Observable, of } from 'rxjs';
 
 import { EntityBrief } from './components/entity/entity-brief/entity-brief';
 import { EntityDetail } from './components/entity/entity-detail/entity-detail';
-import { ENTITY_CATEGORIES, ENTITY_TYPES, isEntityType } from './components/entity/entity.model';
+import { ENTITY_CATEGORIES, ENTITY_TYPES, isEntityCategory, isEntityType } from './components/entity/entity.model';
 import { Frontpage } from './components/frontpage/frontpage';
 
 const recordTypes: Partial<RecordType>[] = [
@@ -134,6 +135,16 @@ function inheritTypes(route: ActivatedRouteSnapshot): Partial<RecordType>[] {
  * would be included in the bundle.
  */
 const recordRoutes: Routes = [
+  // The entity types are hidden types without facets (detail view only): their search, e.g.
+  // `/agents?q=Goethe`, opens the MEF search filtered on the entity, `/mef?q=Goethe&entity=agents`.
+  {
+    matcher: (segments: UrlSegment[]) =>
+      segments.length === 1 && isEntityCategory(segments[0].path)
+        ? { consumed: segments, posParams: { type: segments[0] } }
+        : null,
+    redirectTo: ({ params: { type }, queryParams }) =>
+      inject(Router).createUrlTree(['/mef'], { queryParams: { ...queryParams, entity: type } }),
+  },
   { path: ':type', title: typeResolver, component: RecordSearchPageComponent },
   {
     path: ':type/detail/:pid',

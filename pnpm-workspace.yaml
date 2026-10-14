@@ -4,4 +4,4 @@ allowBuilds:
   lmdb: true
   msgpackr-extract: true
 patchedDependencies:
-  '@rero/ng-core': patches/@rero__ng-core.patch
+  '@rero/ng-core@21.4.0': patches/@rero__ng-core@21.4.0.patch

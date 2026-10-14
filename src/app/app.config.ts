@@ -23,6 +23,7 @@ import { apiTransferCacheInterceptor } from './interceptors/api-transfer-cache.i
 import { dateRangeAggregationInterceptor } from './interceptors/date-range-aggregation.interceptor';
 import { noCacheInterceptor } from './interceptors/no-cache.interceptor';
 import { responseStatusInterceptor } from './interceptors/response-status.interceptor';
+import { strictEncodingInterceptor } from './interceptors/strict-encoding.interceptor';
 import { AppRecordHandleErrorService } from './record-handle-error.service';
 
 /**
@@ -70,6 +71,7 @@ export const appConfig: ApplicationConfig = {
         dateRangeAggregationInterceptor,
         noCacheInterceptor,
         responseStatusInterceptor,
+        strictEncodingInterceptor,
       ]),
     ),
     providePrimeNG(primeNGDarkModeConfig),

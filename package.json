@@ -30,7 +30,7 @@
     "@ngx-formly/primeng": "^7.1.0",
     "@ngx-translate/core": "^17.0.0",
     "@primeuix/themes": "^2.0.3",
-    "@rero/ng-core": "^21.3.0",
+    "@rero/ng-core": "^21.4.0",
     "express": "^5.1.0",
     "ngx-spinner": "^21.1.0",
     "primeng": "^21.1.10",

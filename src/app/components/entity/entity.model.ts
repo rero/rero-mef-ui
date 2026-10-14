@@ -17,6 +17,11 @@ export const ENTITY_CATEGORIES = [
 /** API index of a main entity type: `agents`, `concepts` or `places`. */
 export type EntityCategory = (typeof ENTITY_CATEGORIES)[number]['key'];
 
+/** Type guard: true if `key` is a main entity type (e.g. `agents`). */
+export function isEntityCategory(key: string): key is EntityCategory {
+  return ENTITY_CATEGORIES.some((category) => category.key === key);
+}
+
 /**
  * Entity types: `name` of the type, `category` (main type, e.g. `Agent` for a person), API index
  * `type` and `icon`.
