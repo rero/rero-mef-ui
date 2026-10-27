@@ -11,9 +11,8 @@ WORKDIR /app
 # pnpm version from the `packageManager` field of package.json
 RUN corepack enable
 
-# Dependencies first, cached while the lockfile, the pnpm settings and the patches don't change
+# Dependencies first, cached while the lockfile and the pnpm settings don't change
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY patches ./patches
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
