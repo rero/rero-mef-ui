@@ -151,11 +151,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
           in the source records.
         </p>
         <p>
-          IdRef concept records carry a <code>FRBNF*</code> number in their <code>identifiedBy</code> list (source
-          <code>BNF</code>). GND concept records carry the same <code>FRBNF*</code> number inside their
-          <code>exactMatch</code> entries. If no <code>exactMatch</code> entry contains a BNF identifier, MEF falls back
-          to <code>closeMatch</code> &mdash; but only when exactly one match is found, to avoid ambiguous links. MEF
-          compares these codes across both sources to find and merge matching records.
+          IdRef concept records carry a <code>FRBNF*</code> number in their <code>identifiedBy</code> list (type
+          <code>bf:Nbn</code>); a heading that absorbed several BNF records keeps all of their numbers. GND concept
+          records carry the same <code>FRBNF*</code> number inside their <code>exactMatch</code> entries. If no
+          <code>exactMatch</code> entry contains a BNF identifier, MEF falls back to <code>closeMatch</code>. Whichever
+          is used, all its entries must carry the same BNF number: when they carry different ones, the GND record is not
+          linked, to avoid ambiguous links. MEF compares only the eight digits of the numbers (a trailing check
+          character is ignored) to find and merge matching records.
         </p>
         <p>
           <strong>RERO</strong> concept records are also included in MEF but do not carry a cross-source identifier, so
@@ -182,13 +184,18 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             </tr>
             <tr>
               <th scope="row">IdRef field</th>
-              <td><code>identifiedBy[source="BNF"].value</code></td>
+              <td>
+                <code>identifiedBy[type="bf:Nbn"].value</code>
+                <div class="muted text-xs">all the numbers, when there are several</div>
+              </td>
             </tr>
             <tr>
               <th scope="row">GND field</th>
               <td>
-                <code>exactMatch[].identifiedBy[source="BNF"].value</code>
-                <div class="muted text-xs">fallback: <code>closeMatch[]</code> when exactly one match</div>
+                <code>exactMatch[].identifiedBy[type="bf:Nbn"].value</code>
+                <div class="muted text-xs">
+                  fallback: <code>closeMatch[]</code>; no link when the entries carry different numbers
+                </div>
               </td>
             </tr>
           </tbody>
@@ -219,8 +226,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         </svg>
         <figcaption class="caption">
           IdRef and GND each embed the same <code>FRBNF*</code> BNF number in different fields. GND uses
-          <code>exactMatch</code> entries, falling back to <code>closeMatch</code> when exactly one is found. MEF
-          matches those codes across sources to link the records.
+          <code>exactMatch</code> entries, falling back to <code>closeMatch</code>; entries carrying different numbers
+          give no link. MEF matches those codes across sources to link the records.
         </figcaption>
       </figure>
     </div>
@@ -248,7 +255,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
           GND place records serve as the anchor: their own <code>pid</code> is the link key. IdRef place records embed
           the corresponding GND PID (prefixed with <code>(DE-101)</code>) inside their <code>identifiedBy</code> list
           (source <code>GND</code>, type <code>bf:Nbn</code>). MEF strips the prefix and matches the bare PID to find
-          the corresponding GND record.
+          the corresponding GND record. An IdRef record stating several different GND PIDs is not linked.
         </p>
         <table>
           <tbody>
