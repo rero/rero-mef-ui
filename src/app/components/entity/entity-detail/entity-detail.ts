@@ -11,11 +11,13 @@ import { Error } from '../../error/error';
 import { EntityField } from '../entity-field/entity-field';
 import { EntityIcon } from '../entity-icon/entity-icon';
 import { EntityJson } from '../entity-json/entity-json';
+import { EntityLinking } from '../entity-linking/entity-linking';
 import { EntityRelation } from '../entity-relation/entity-relation';
 import { EntitySources } from '../entity-sources/entity-sources';
 import { EntityTypeLabel } from '../entity-type/entity-type';
 import { ENTITY_TYPES, EntityRecord, SOURCE_LABELS } from '../entity.model';
 import { entityName, sourceColor } from '../entity.utils';
+import { recordLinking } from '../record-linking';
 import { comparisonLayout, comparisonRows, sourceFields, SourceSection } from './source-fields';
 
 @Component({
@@ -25,6 +27,7 @@ import { comparisonLayout, comparisonRows, sourceFields, SourceSection } from '.
     EntityField,
     EntityIcon,
     EntityJson,
+    EntityLinking,
     EntityRelation,
     EntitySources,
     EntityTypeLabel,
@@ -83,16 +86,27 @@ export class EntityDetail {
     return this.apiService.getRefEndpoint(`${this.dataType()}/${source}`, pid);
   }
 
-  /** Sources of the record with their displayed fields, computed once per record. */
+  /** How the sources of the record are linked, which depends on its entity type: `undefined` without sources. */
+  protected readonly linking = computed(() => {
+    const metadata = this.record()?.metadata;
+    return metadata ? recordLinking(metadata) : undefined;
+  });
+
+  /**
+   * Sources of the record with their displayed fields, computed once per record. The value carrying
+   * the link key of a linked source is flagged.
+   */
   protected readonly sourceSections = computed<SourceSection[]>(() => {
     const metadata = this.record()?.metadata;
+    const links = this.linking()?.sources ?? [];
     return (metadata?.sources ?? []).map((source) => {
       const data = metadata?.[source];
+      const link = links.find((item) => item.source === source);
       return {
         source,
         label: SOURCE_LABELS[source],
         pid: data?.pid,
-        fields: data ? sourceFields(data) : [],
+        fields: data ? sourceFields(data, link?.flag) : [],
       };
     });
   });

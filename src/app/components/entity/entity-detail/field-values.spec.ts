@@ -73,18 +73,6 @@ describe('fieldValues', () => {
     ]);
   });
 
-  it('should flag the VIAF identifier as link key', () => {
-    expect(
-      values([
-        { source: 'VIAF', type: 'uri', value: 'http://viaf.org/viaf/779232' },
-        { source: 'IDREF', type: 'uri', value: 'http://www.idref.fr/165795182' },
-      ]),
-    ).toEqual([
-      { text: 'http://viaf.org/viaf/779232', url: 'http://viaf.org/viaf/779232', linkKey: true },
-      { text: 'http://www.idref.fr/165795182', url: 'http://www.idref.fr/165795182' },
-    ]);
-  });
-
   it('should display an identifier as a link', () => {
     expect(values([{ source: 'IDREF', type: 'uri', value: 'http://www.idref.fr/027237850' }])).toEqual([
       { text: 'http://www.idref.fr/027237850', url: 'http://www.idref.fr/027237850' },

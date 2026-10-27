@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         } @else {
           <span>{{ value.text }}</span>
         }
-        <!-- As the VIAF pid of the main record -->
+        <!-- Value carrying the link key of the source (see the linking card) -->
         @if (value.linkKey) {
           <p-tag severity="success" value="LINK KEY" />
         }
@@ -100,7 +100,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <span class="sr-only">(opens in a new window)</span>
               </a>
               <app-entity-json [index]="dataType() + '/viaf'" [pid]="metadata.viaf_pid" label="VIAF" />
-              <p-tag severity="success" value="LINK KEY" />
+              <!-- Only the agents are linked by VIAF: GND PID or BNF identifier for the others -->
+              @if (linking()?.category === 'agents') {
+                <p-tag severity="success" value="LINK KEY" />
+              }
             </span>
             <!-- Same cluster on the VIAF website -->
             @if (entity.links['viaf.org']; as viafOrgUrl) {
@@ -131,6 +134,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
       }
     </dl>
   </section>
+
+  <!-- Linking of the sources, by entity type -->
+  @if (linking(); as recordLinking) {
+    <app-entity-linking class="mb-8" [linking]="recordLinking" [pid]="metadata.pid" />
+  }
 
   <!-- Sources: one tab per source -->
   @if (metadata.sources.length) {

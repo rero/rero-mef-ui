@@ -58,7 +58,8 @@ export type EntityType = keyof typeof ENTITY_TYPES;
 
 /** Type guard: true if `key` is a known entity type (e.g. `bf:Person`). */
 export function isEntityType(key: string): key is EntityType {
-  return key in ENTITY_TYPES;
+  // Own keys only: `in` would accept the inherited ones, e.g. `constructor`
+  return Object.hasOwn(ENTITY_TYPES, key);
 }
 
 export type EntitySourceName = 'gnd' | 'idref' | 'rero';
@@ -81,6 +82,9 @@ export const SOURCE_TAG_SEVERITY = {
   rero: 'warn',
   viaf: 'success',
 } as const satisfies Record<AuthoritySource, Tag['severity']>;
+
+/** An object of the API (e.g. an item of `identifiedBy`). */
+export type ApiObject = Record<string, unknown>;
 
 export type EntitySource = {
   pid: string;

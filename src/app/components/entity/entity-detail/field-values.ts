@@ -1,18 +1,18 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { ApiObject } from '../entity.model';
+import { isObject } from '../entity.utils';
+
 /** A value of a source field, ready to be displayed. */
 export interface FieldValue {
   text: string;
   url?: string;
   /** `relation_pid`: icon and label of the redirect direction, `text` is the related pid. */
   redirect?: { class: string; label: string };
-  /** VIAF identifier: link key of the MEF record, flagged as the VIAF pid of the main record. */
+  /** Value carrying the link key of the source (VIAF cluster, GND PID or BNF identifier, see `recordLinking`). */
   linkKey?: boolean;
 }
-
-/** An object of the API (e.g. an item of `identifiedBy`). */
-type ApiObject = Record<string, unknown>;
 
 /**
  * Formatter of a known object shape: its values, or `undefined` when the object doesn't have
@@ -33,10 +33,6 @@ export function humanize(key: string): string {
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .toLowerCase();
   return label.charAt(0).toUpperCase() + label.slice(1);
-}
-
-function isObject(value: unknown): value is ApiObject {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function isUrl(text: string): boolean {
@@ -62,19 +58,11 @@ const relationPid: ObjectFormatter = (object) => {
 };
 
 /**
- * `identifiedBy`: identifier of the record in another system. The VIAF one is the link key.
+ * `identifiedBy`: identifier of the record in another system.
  * e.g. `{ source: 'VIAF', type: 'uri', value: 'http://viaf.org/viaf/779232' }`
  */
-const identifier: ObjectFormatter = (object) => {
-  if (!('value' in object)) {
-    return undefined;
-  }
-  const [item] = fieldValues(object['value']);
-  if (!item) {
-    return [];
-  }
-  return [object['source'] === 'VIAF' ? { ...item, linkKey: true } : item];
-};
+const identifier: ObjectFormatter = (object) =>
+  'value' in object ? fieldValues(object['value']).slice(0, 1) : undefined;
 
 /**
  * `broader`, `narrower`, `related`, `closeMatch`, `exactMatch`: linked entity, with its source and
@@ -132,10 +120,15 @@ const OBJECT_FORMATTERS: ObjectFormatter[] = [relationPid, identifier, linkedEnt
 /**
  * Values of a source field, ready to be displayed, whatever its shape: text, number, list or
  * object. Objects of an unknown shape are displayed as JSON.
+ * @param linkKeys - Items of the field (as in the API) carrying the link key, flagged: the items
+ * themselves, not their text, as other items may be displayed the same way.
  */
-export function fieldValues(value: unknown): FieldValue[] {
+export function fieldValues(value: unknown, linkKeys: readonly unknown[] = []): FieldValue[] {
   if (Array.isArray(value)) {
-    return value.flatMap(fieldValues);
+    return value.flatMap((item) => fieldValues(item, linkKeys));
+  }
+  if (linkKeys.includes(value)) {
+    return fieldValues(value).map((item) => ({ ...item, linkKey: true }));
   }
   if (isObject(value)) {
     for (const format of OBJECT_FORMATTERS) {

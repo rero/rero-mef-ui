@@ -1,7 +1,14 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { AuthoritySource, ENTITY_TYPES, EntityMetadata, EntityType, SOURCE_TAG_SEVERITY } from './entity.model';
+import {
+  ApiObject,
+  AuthoritySource,
+  ENTITY_TYPES,
+  EntityMetadata,
+  EntityType,
+  SOURCE_TAG_SEVERITY,
+} from './entity.model';
 
 /**
  * Readable type of an entity: main type and type, e.g. `Agent: Person`, or only the main type when
@@ -31,4 +38,9 @@ export function entityName(metadata: EntityMetadata): string | undefined {
  */
 export function sourceColor(source: AuthoritySource): string {
   return `var(--p-tag-${SOURCE_TAG_SEVERITY[source] ?? 'primary'}-color)`;
+}
+
+/** Type guard: true if `value` is an object of the API (not `null`, nor an array). */
+export function isObject(value: unknown): value is ApiObject {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

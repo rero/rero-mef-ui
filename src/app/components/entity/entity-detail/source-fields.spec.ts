@@ -30,6 +30,23 @@ describe('sourceFields', () => {
     });
   });
 
+  it('should flag the item carrying the link key, not the items displayed the same way', () => {
+    const gnd = { source: 'GND', type: 'bf:Nbn', value: '(DE-101)130692220' };
+    const [, identifiedBy] = sourceFields(
+      {
+        pid: '1',
+        identifiedBy: [{ ...gnd }, gnd, { source: 'VIAF', type: 'uri', value: 'http://viaf.org/viaf/1' }],
+        type: 'bf:Place',
+      },
+      { field: 'identifiedBy', items: [gnd] },
+    );
+    expect(identifiedBy.values).toEqual([
+      { text: '(DE-101)130692220', url: undefined },
+      { text: '(DE-101)130692220', url: undefined, linkKey: true },
+      { text: 'http://viaf.org/viaf/1', url: 'http://viaf.org/viaf/1' },
+    ]);
+  });
+
   it('should display the deletion date in red and bold', () => {
     const [, deleted] = sourceFields({ pid: '1', deleted: '2024-01-01', type: 'bf:Person' });
     expect(deleted).toMatchObject({ key: 'deleted', alert: true, bold: true, date: true });

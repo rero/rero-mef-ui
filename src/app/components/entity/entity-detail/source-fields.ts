@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { EntitySource, EntitySourceName } from '../entity.model';
+import { LinkKeyFlag } from '../record-linking';
 import { FieldValue, fieldValues, humanize } from './field-values';
 
 /** Display options of a source field, which depend only on its key. */
@@ -64,11 +65,17 @@ function fieldDisplay(key: string): FieldDisplay {
   };
 }
 
-/** Displayed fields of a source record (technical and empty fields excluded), in the API order. */
-export function sourceFields(data: EntitySource): SourceField[] {
+/**
+ * Displayed fields of a source record (technical and empty fields excluded), in the API order.
+ * @param linkKey - Items carrying the link key of the source, flagged with the LINK KEY tag.
+ */
+export function sourceFields(data: EntitySource, linkKey?: LinkKeyFlag): SourceField[] {
   return Object.entries(data)
     .filter(([key]) => !HIDDEN_SOURCE_FIELDS.has(key))
-    .map(([key, value]) => ({ ...fieldDisplay(key), values: fieldValues(value) }))
+    .map(([key, value]) => ({
+      ...fieldDisplay(key),
+      values: fieldValues(value, key === linkKey?.field ? linkKey.items : []),
+    }))
     .filter((field) => field.values.length > 0);
 }
 

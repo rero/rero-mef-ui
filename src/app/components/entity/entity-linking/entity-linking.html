@@ -1,0 +1,75 @@
+<!--
+SPDX-FileCopyrightText: Fondation RERO+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+@let link = linking();
+
+<!-- Arrow between two nodes of the diagram (`DiagramArrow`), downwards on mobile -->
+<ng-template #arrow let-arrow>
+  <div class="flex shrink-0 flex-col items-center gap-1 self-center text-xs font-semibold" aria-hidden="true">
+    @if (arrow.label) {
+      <span [class]="arrow.broken ? 'text-danger-strong' : 'text-green-700 dark:text-green-400'">{{
+        arrow.label
+      }}</span>
+    }
+    <i class="fa-solid fa-arrow-right text-lg text-ink-subtle max-md:rotate-90"></i>
+  </div>
+</ng-template>
+
+<section aria-labelledby="linking-title" class="rounded-lg border border-line bg-surface shadow-sm">
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-line px-5 py-3">
+    <h2 id="linking-title" class="mb-0 text-lg font-semibold text-heading">
+      Linking
+      <span class="text-base font-normal text-ink-muted">by {{ link.method }}</span>
+    </h2>
+    <a routerLink="/linking" [fragment]="link.category" class="text-sm">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      How {{ link.category }} are linked
+    </a>
+  </div>
+
+  <div class="flex flex-col gap-3 px-5 pt-4 md:flex-row">
+    <!-- Sources, with their link key -->
+    <ol class="flex min-w-0 flex-1 flex-col gap-2" aria-label="Sources">
+      @for (source of link.sources; track source.source) {
+        @let status = statuses[source.status];
+        <li
+          class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-3 py-2"
+          [class]="status.alert ? 'border-danger bg-danger-surface' : 'border-line bg-surface-muted'">
+          <p-tag class="min-w-14 justify-center" [value]="labels[source.source]" [severity]="severity[source.source]" />
+          @if (source.value) {
+            <span class="flex min-w-0 flex-wrap items-baseline gap-x-2">
+              <span class="text-sm text-ink-muted">{{ source.field }}</span>
+              <code class="font-mono text-sm break-all text-heading">{{ source.value }}</code>
+            </span>
+          }
+          <span class="ms-auto flex items-center gap-1.5 text-sm font-medium" [class]="status.class">
+            <i [class]="status.icon" aria-hidden="true"></i>
+            {{ status.label }}
+          </span>
+        </li>
+      }
+    </ol>
+
+    <!-- Agents: VIAF cluster, linking hub of the sources -->
+    @let diagram = arrows();
+    @if (diagram.hub; as hubArrow) {
+      <ng-container *ngTemplateOutlet="arrow; context: { $implicit: hubArrow }" />
+      <div
+        class="flex shrink-0 flex-col items-center gap-1 self-center rounded-lg border px-4 py-2"
+        [class]="link.hub ? 'border-green-700 dark:border-green-400' : 'border-dashed border-line'">
+        <p-tag value="VIAF" [severity]="severity.viaf" />
+        <code class="font-mono text-sm text-heading">{{ link.hub ?? 'no cluster' }}</code>
+      </div>
+    }
+    <ng-container *ngTemplateOutlet="arrow; context: { $implicit: diagram.mef }" />
+
+    <!-- MEF record -->
+    <div class="flex shrink-0 flex-col items-center self-center rounded-lg bg-mef-blue px-5 py-2 text-white">
+      <span class="font-semibold">MEF</span>
+      <span class="font-mono text-sm">{{ pid() }}</span>
+    </div>
+  </div>
+
+  <p class="mb-0 px-5 py-3 text-sm text-ink-muted">{{ summary() }}</p>
+</section>
