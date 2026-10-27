@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: Fondation RERO+
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-@let link = linking();
+@let link = display();
 
 <!-- Arrow between two nodes of the diagram (`DiagramArrow`), downwards on mobile -->
 <ng-template #arrow let-arrow>
@@ -70,6 +70,42 @@ SPDX-License-Identifier: AGPL-3.0-or-later
       <span class="font-mono text-sm">{{ pid() }}</span>
     </div>
   </div>
+
+  <!-- Records carrying the link key of a contested source: MEF links none of them -->
+  @if (link.carriers; as carriers) {
+    <div class="px-5 pt-3">
+      <h3 id="linking-carriers" class="mb-1 text-sm font-semibold text-heading">
+        {{ severalKeys() ? 'Records carrying its keys' : 'Records carrying the same key' }}
+      </h3>
+      <ul class="flex flex-col divide-y divide-line text-sm" aria-labelledby="linking-carriers">
+        @for (carrier of carriers; track carrier.source + carrier.pid) {
+          <li class="flex flex-wrap items-center gap-x-3 gap-y-1 py-1.5">
+            <p-tag
+              class="min-w-14 justify-center"
+              [value]="labels[carrier.source]"
+              [severity]="severity[carrier.source]" />
+            @if (carrier.name) {
+              <span class="min-w-0 font-medium">{{ carrier.name }}</span>
+            }
+            <code class="font-mono text-ink-muted">{{ carrier.pid }}</code>
+            @if (severalKeys()) {
+              <code class="font-mono text-heading">{{ carrier.keys.join(', ') }}</code>
+            }
+            @if (carrier.level) {
+              <span class="text-ink-muted">{{ carrier.level }}</span>
+            }
+            <span class="ms-auto">
+              @if (carrier.current) {
+                <span class="text-ink-muted">This record</span>
+              } @else if (carrier.mef; as mef) {
+                <a [routerLink]="mef.link">MEF {{ mef.pid }}</a>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
 
   <p class="mb-0 px-5 py-3 text-sm text-ink-muted">{{ summary() }}</p>
 </section>

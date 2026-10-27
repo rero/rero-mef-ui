@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { ApiObject } from '../entity.model';
-import { isObject } from '../entity.utils';
+import { apiObjects, isObject } from '../entity.utils';
 
 /** A value of a source field, ready to be displayed. */
 export interface FieldValue {
@@ -12,13 +12,17 @@ export interface FieldValue {
   redirect?: { class: string; label: string };
   /** Value carrying the link key of the source (VIAF cluster, GND PID or BNF identifier, see `recordLinking`). */
   linkKey?: boolean;
+  /** Source of a linked entity or of an identifier, displayed in parentheses, e.g. `FRBNF16778187 (BNF)`. */
+  source?: string;
+  /** `closeMatch`, `exactMatch`: identifiers of the linked entity other than its link (e.g. its BNF number). */
+  identifiers?: FieldValue[];
 }
 
 /**
  * Formatter of a known object shape: its values, or `undefined` when the object doesn't have
  * this shape (the next formatter is then tried).
  */
-type ObjectFormatter = (object: ApiObject) => FieldValue[] | undefined;
+type ObjectFormatter = (object: ApiObject, linkKeys: readonly unknown[]) => FieldValue[] | undefined;
 
 /** Icons of the `relation_pid` types: GND `redirect_to` and IdRef `redirect_from`. */
 const RELATION_ICONS: Record<string, FieldValue['redirect']> = {
@@ -58,25 +62,44 @@ const relationPid: ObjectFormatter = (object) => {
 };
 
 /**
- * `identifiedBy`: identifier of the record in another system.
+ * `identifiedBy`: identifier of the record in another system, with its source, e.g.
+ * `FRBNF17049343 (BNF)`.
  * e.g. `{ source: 'VIAF', type: 'uri', value: 'http://viaf.org/viaf/779232' }`
  */
-const identifier: ObjectFormatter = (object) =>
-  'value' in object ? fieldValues(object['value']).slice(0, 1) : undefined;
+const identifier: ObjectFormatter = (object) => {
+  if (!('value' in object)) {
+    return undefined;
+  }
+  const source = asString(object['source']);
+  return fieldValues(object['value'])
+    .slice(0, 1)
+    .map((value) => ({ ...value, source }));
+};
 
 /**
- * `broader`, `narrower`, `related`, `closeMatch`, `exactMatch`: linked entity, with its source and
- * a link to its first identifier which is a URL (e.g. the BNF or DNLM record).
+ * `broader`, `narrower`, `related`, `closeMatch`, `exactMatch`: linked entity, with its source, a
+ * link to its first identifier which is a URL (e.g. the BNF or DNLM record) and its other
+ * identifiers (e.g. the BNF number and the GND PID), the ones carrying the link key flagged.
  * e.g. `{ authorized_access_point: 'Minocycline', source: 'BNF', identifiedBy: [...] }`
  */
-const linkedEntity: ObjectFormatter = (object) => {
+const linkedEntity: ObjectFormatter = (object, linkKeys) => {
   const name = asString(object['authorized_access_point']);
   if (name === undefined) {
     return undefined;
   }
-  const source = asString(object['source']);
-  const url = fieldValues(object['identifiedBy']).find((item) => item.url)?.url;
-  return [{ text: source ? `${name} (${source})` : name, url }];
+  const values = fieldValues(apiObjects(object['identifiedBy']), linkKeys);
+  // The identifier linked from the name is not repeated: its link key (e.g. a BNF ark) goes to the name
+  const link = values.find((item) => item.url);
+  const identifiers = values.filter((item) => item !== link);
+  return [
+    {
+      text: name,
+      url: link?.url,
+      source: asString(object['source']),
+      linkKey: link?.linkKey,
+      identifiers: identifiers.length ? identifiers : undefined,
+    },
+  ];
 };
 
 /**
@@ -121,7 +144,8 @@ const OBJECT_FORMATTERS: ObjectFormatter[] = [relationPid, identifier, linkedEnt
  * Values of a source field, ready to be displayed, whatever its shape: text, number, list or
  * object. Objects of an unknown shape are displayed as JSON.
  * @param linkKeys - Items of the field (as in the API) carrying the link key, flagged: the items
- * themselves, not their text, as other items may be displayed the same way.
+ * themselves, not their text, as other items may be displayed the same way. Also searched in the
+ * identifiers of the matches.
  */
 export function fieldValues(value: unknown, linkKeys: readonly unknown[] = []): FieldValue[] {
   if (Array.isArray(value)) {
@@ -132,7 +156,7 @@ export function fieldValues(value: unknown, linkKeys: readonly unknown[] = []): 
   }
   if (isObject(value)) {
     for (const format of OBJECT_FORMATTERS) {
-      const values = format(value);
+      const values = format(value, linkKeys);
       if (values) {
         return values;
       }

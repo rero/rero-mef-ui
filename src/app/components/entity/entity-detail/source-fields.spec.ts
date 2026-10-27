@@ -41,10 +41,26 @@ describe('sourceFields', () => {
       { field: 'identifiedBy', items: [gnd] },
     );
     expect(identifiedBy.values).toEqual([
-      { text: '(DE-101)130692220', url: undefined },
-      { text: '(DE-101)130692220', url: undefined, linkKey: true },
-      { text: 'http://viaf.org/viaf/1', url: 'http://viaf.org/viaf/1' },
+      { text: '(DE-101)130692220', url: undefined, source: 'GND' },
+      { text: '(DE-101)130692220', url: undefined, source: 'GND', linkKey: true },
+      { text: 'http://viaf.org/viaf/1', url: 'http://viaf.org/viaf/1', source: 'VIAF' },
     ]);
+  });
+
+  it('should hide the matches without identifier, and the field when none is left', () => {
+    const uri = { source: 'LCSH', type: 'uri', value: 'http://id.loc.gov/authorities/subjects/sh85040989' };
+    const fields = sourceFields({
+      pid: '1',
+      type: 'bf:Topic',
+      closeMatch: [
+        { authorized_access_point: 'Éducation', source: 'RVMLaval' },
+        { authorized_access_point: 'Education', source: 'LCSH', identifiedBy: [uri] },
+      ],
+      exactMatch: [{ authorized_access_point: 'Éducation', source: 'RVMLaval', identifiedBy: [] }],
+      broader: [{ authorized_access_point: 'Civilisation' }],
+    });
+    expect(fields.map(({ key }) => key)).toEqual(['pid', 'type', 'closeMatch', 'broader']);
+    expect(fields[2].values).toEqual([{ text: 'Education', url: uri.value, source: 'LCSH' }]);
   });
 
   it('should display the deletion date in red and bold', () => {

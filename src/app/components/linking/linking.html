@@ -157,7 +157,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
           <code>exactMatch</code> entry contains a BNF identifier, MEF falls back to <code>closeMatch</code>. Whichever
           is used, all its entries must carry the same BNF number: when they carry different ones, the GND record is not
           linked, to avoid ambiguous links. MEF compares only the eight digits of the numbers (a trailing check
-          character is ignored) to find and merge matching records.
+          character is ignored) to find and merge matching records. A BNF number carried by several records of a source
+          links none of them, unless a single GND record carries it in an <code>exactMatch</code> entry.
         </p>
         <p>
           <strong>RERO</strong> concept records are also included in MEF but do not carry a cross-source identifier, so
@@ -255,7 +256,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
           GND place records serve as the anchor: their own <code>pid</code> is the link key. IdRef place records embed
           the corresponding GND PID (prefixed with <code>(DE-101)</code>) inside their <code>identifiedBy</code> list
           (source <code>GND</code>, type <code>bf:Nbn</code>). MEF strips the prefix and matches the bare PID to find
-          the corresponding GND record. An IdRef record stating several different GND PIDs is not linked.
+          the corresponding GND record. An IdRef record stating several different GND PIDs is not linked, nor are
+          several IdRef records stating the same GND PID.
         </p>
         <table>
           <tbody>

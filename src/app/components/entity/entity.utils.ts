@@ -44,3 +44,8 @@ export function sourceColor(source: AuthoritySource): string {
 export function isObject(value: unknown): value is ApiObject {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
+
+/** The objects of an API list (e.g. `identifiedBy`), the other items skipped; a single object as a list of one. */
+export function apiObjects(value: unknown): ApiObject[] {
+  return [value].flat().filter(isObject);
+}

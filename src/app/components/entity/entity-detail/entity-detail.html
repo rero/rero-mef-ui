@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   </div>
 </ng-template>
 
-<!-- Values of a source field: links, dates, redirects and link key -->
+<!-- Values of a source field: links, dates, redirects, match identifiers and link key -->
 <ng-template #fieldValueList let-values="values" let-date="date" let-source="source">
   @for (value of values; track $index) {
     @if (value.redirect) {
@@ -35,11 +35,37 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         } @else {
           <span>{{ value.text }}</span>
         }
+        @if (value.source) {
+          <span class="-ml-2 font-normal text-ink-muted">({{ value.source }})</span>
+        }
         <!-- Value carrying the link key of the source (see the linking card) -->
         @if (value.linkKey) {
           <p-tag severity="success" value="LINK KEY" />
         }
       </span>
+      <!-- Identifiers of a match other than its link, with their source, e.g. its BNF number -->
+      @if (value.identifiers; as identifiers) {
+        <ul class="mb-1 flex list-none flex-col gap-y-1 p-0 pl-4 text-sm font-normal" aria-label="Identifiers">
+          @for (identifier of identifiers; track $index) {
+            <li class="flex flex-wrap items-center gap-x-2">
+              @if (identifier.url) {
+                <a class="break-all" [href]="identifier.url" target="_blank" rel="noopener">
+                  {{ identifier.text }}
+                  <span class="sr-only">(opens in a new window)</span>
+                </a>
+              } @else {
+                <code class="font-mono break-all text-heading">{{ identifier.text }}</code>
+              }
+              @if (identifier.source) {
+                <span class="text-ink-muted">({{ identifier.source }})</span>
+              }
+              @if (identifier.linkKey) {
+                <p-tag severity="success" value="LINK KEY" />
+              }
+            </li>
+          }
+        </ul>
+      }
     }
   }
 </ng-template>

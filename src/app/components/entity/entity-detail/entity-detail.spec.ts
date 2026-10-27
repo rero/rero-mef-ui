@@ -76,7 +76,12 @@ describe('EntityDetail', () => {
     expect(tabs).toEqual(['Compare', 'GND', 'IdRef']);
     // Fields of the first source, in the API order, without the hidden ones (`identifier`, `md5`)
     const gndValues = [...element.querySelectorAll('p-tabpanel')[1].querySelectorAll('dd')].map(spokenText);
-    expect(gndValues).toEqual(['123', 'bf:Person', 'Doe, John', 'http://d-nb.info/gnd/123 (opens in a new window)']);
+    expect(gndValues).toEqual([
+      '123',
+      'bf:Person',
+      'Doe, John',
+      'http://d-nb.info/gnd/123 (opens in a new window)(GND)',
+    ]);
   });
 
   it('should compare the sources in a first tab, with one column per source', async () => {

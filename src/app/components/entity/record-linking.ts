@@ -10,7 +10,7 @@ import {
   EntitySourceName,
   isEntityType,
 } from './entity.model';
-import { isObject } from './entity.utils';
+import { apiObjects } from './entity.utils';
 
 /*
  * The rules below reproduce the linking of the MEF server (rero-mef repository), which is the
@@ -27,12 +27,16 @@ import { isObject } from './entity.utils';
  * - `unshared`: the source carries a link key, but no other source shares it;
  * - `mismatch`: the sources carry different link keys (agents: another VIAF cluster than the record);
  * - `ambiguous`: the source states several different link keys, so MEF doesn't link it;
+ * - `contested`: other records carry the link key of the source too, so MEF links none of them;
  * - `missing`: the source doesn't carry a link key;
  * - `excluded`: the source is not cross-linked for this entity type (RERO concepts).
  */
-export type LinkStatus = 'linked' | 'unshared' | 'mismatch' | 'ambiguous' | 'missing' | 'excluded';
+export type LinkStatus = 'linked' | 'unshared' | 'mismatch' | 'ambiguous' | 'contested' | 'missing' | 'excluded';
 
-/** Source field and items of this field (as in the API) flagged with the LINK KEY tag. */
+/**
+ * Source field and items of this field (as in the API) flagged with the LINK KEY tag: its values, or
+ * identifiers nested in its entries (the BNF identifier of a GND match).
+ */
 export interface LinkKeyFlag {
   field: string;
   items: unknown[];
@@ -46,6 +50,10 @@ export interface SourceLink {
   field?: string;
   /** Link key as written in the source, e.g. `(DE-101)130692220`; all of them when several. */
   value?: string;
+  /** Normalized link keys, as indexed by MEF (`_association_identifier`), e.g. `130692220`. */
+  keys?: string[];
+  /** Pid of the source record carrying the link keys. */
+  pid?: string;
   /** Items carrying the shared link key: only for a linked source. */
   flag?: LinkKeyFlag;
 }
@@ -60,6 +68,36 @@ export interface RecordLinking {
   /** Link key shared by the sources, when they are linked. */
   key?: string;
   sources: SourceLink[];
+  /** Source records carrying the link key of a `contested` source, this record's included. */
+  carriers?: KeyCarrier[];
+  /** Source of the records carrying the key without a single winner: why MEF links none of them. */
+  conflict?: EntitySourceName;
+}
+
+/** A source record carrying a link key, as indexed by MEF (`_association_identifier`). */
+export interface KeyCarrier {
+  source: EntitySourceName;
+  pid: string;
+  name?: string;
+  /** Link keys of the searched record it carries. */
+  keys: string[];
+  /** Statement the key is read from (`_association_level`): `exactMatch` or `closeMatch` (GND concepts). */
+  level?: string;
+  /** MEF record of the source record, when found. */
+  mef?: { pid: string; link: string };
+  /** Source record of the displayed MEF record. */
+  current?: boolean;
+}
+
+/** Search of the source records carrying the link keys of a record (`_association_identifier`). */
+export interface CarrierSearch {
+  category: EntityCategory;
+  keys: string[];
+  /** Sources linked by a shared identifier, searched. */
+  sources: EntitySourceName[];
+  /** Source record carrying the keys. */
+  source: EntitySourceName;
+  pid: string;
 }
 
 /** Link key found in a source record. */
@@ -85,11 +123,6 @@ interface SourceKeys {
 }
 
 type KeyFinder = (data: EntitySource) => SourceKeys;
-
-/** The objects of an API list (e.g. `identifiedBy`), the other items skipped. */
-function objects(value: unknown): ApiObject[] {
-  return Array.isArray(value) ? value.filter(isObject) : [];
-}
 
 /** The string value of an API object, `undefined` when missing or empty. */
 function stringValue({ value }: ApiObject): string | undefined {
@@ -120,7 +153,7 @@ const gndPlaceKeys: KeyFinder = ({ pid }) => ({
 /** Places, IdRef: the GND PID in `identifiedBy` (source `GND`, type `bf:Nbn`), with the `(DE-101)` prefix. */
 const idrefPlaceKeys: KeyFinder = ({ identifiedBy }) =>
   uniqueKey(
-    objects(identifiedBy).flatMap((item) => {
+    apiObjects(identifiedBy).flatMap((item) => {
       const value = stringValue(item);
       const { source, type } = item;
       return source === 'GND' && type === 'bf:Nbn' && value?.startsWith(GND_PID_PREFIX)
@@ -154,7 +187,7 @@ function bnfNumber(item: ApiObject): string | undefined {
 
 /** Concepts, IdRef: every BNF number in `identifiedBy` (a merged heading keeps all of them). */
 const idrefConceptKeys: KeyFinder = ({ identifiedBy }) => ({
-  keys: objects(identifiedBy).flatMap((item) => {
+  keys: apiObjects(identifiedBy).flatMap((item) => {
     const key = bnfNumber(item);
     return key
       ? [{ field: 'identifiedBy (BNF)', value: stringValue(item) ?? key, key, apiField: 'identifiedBy', item }]
@@ -164,16 +197,15 @@ const idrefConceptKeys: KeyFinder = ({ identifiedBy }) => ({
 
 /**
  * Concepts, GND: the BNF number of the `exactMatch` entries, or else of the `closeMatch` ones. As
- * MEF, the first match type carrying a BNF number decides.
+ * MEF, the first match type carrying a BNF number decides. The flagged item is the BNF identifier
+ * of the entry, not the entry itself.
  */
 const gndConceptKeys: KeyFinder = (data) => {
   for (const field of ['exactMatch', 'closeMatch']) {
-    const found = objects(data[field]).flatMap((match) =>
-      objects(match['identifiedBy']).flatMap((item) => {
+    const found = apiObjects(data[field]).flatMap((match) =>
+      apiObjects(match['identifiedBy']).flatMap((item) => {
         const key = bnfNumber(item);
-        return key
-          ? [{ field: `${field} (BNF)`, value: stringValue(item) ?? key, key, apiField: field, item: match }]
-          : [];
+        return key ? [{ field: `${field} (BNF)`, value: stringValue(item) ?? key, key, apiField: field, item }] : [];
       }),
     );
     if (found.length) {
@@ -199,7 +231,7 @@ function agentLink(source: EntitySourceName, data: EntitySource | undefined, hub
     return { source, status: 'missing' };
   }
   const { pid, identifiedBy } = data;
-  const viafs = objects(identifiedBy).filter((item) => item['source'] === 'VIAF' && stringValue(item));
+  const viafs = apiObjects(identifiedBy).filter((item) => item['source'] === 'VIAF' && stringValue(item));
   const viaf = viafs.find((item) => viafId(stringValue(item) ?? '') === hub);
   return {
     source,
@@ -226,13 +258,15 @@ const KEY_FINDERS: Record<Exclude<EntityCategory, 'agents'>, Partial<Record<Enti
 /**
  * Link of a source carrying keys: all their values, and the items to flag when the source is linked.
  */
-function keysLink(source: EntitySourceName, status: LinkStatus, found: FoundKey[]): SourceLink {
+function keysLink(source: EntitySourceName, pid: string, status: LinkStatus, found: FoundKey[]): SourceLink {
   const [{ field, apiField }] = found;
   return {
     source,
     status,
     field,
     value: distinct(found.map(({ value }) => value)).join(', '),
+    keys: distinct(found.map(({ key }) => key)),
+    pid,
     flag: status === 'linked' ? { field: apiField, items: found.map(({ item }) => item) } : undefined,
   };
 }
@@ -258,7 +292,7 @@ export function recordLinking(metadata: EntityMetadata): RecordLinking | undefin
   const found = sources.map((source) => {
     const finder = finders[source];
     const data = metadata[source];
-    return { source, excluded: !finder, ...(finder && data ? finder(data) : { keys: [] }) };
+    return { source, pid: data?.pid ?? '', excluded: !finder, ...(finder && data ? finder(data) : { keys: [] }) };
   });
   const carriers = found.filter(({ keys }) => keys.length);
   // Linked when at least two sources carry the same key (IdRef concepts may carry several)
@@ -267,12 +301,12 @@ export function recordLinking(metadata: EntityMetadata): RecordLinking | undefin
       ? carriers[0].keys.find(({ key }) => carriers.every(({ keys }) => keys.some((other) => other.key === key)))?.key
       : undefined;
   const otherwise: LinkStatus = carriers.length > 1 ? 'mismatch' : 'unshared';
-  const links = found.map(({ source, excluded, keys, ambiguous }): SourceLink => {
+  const links = found.map(({ source, pid, excluded, keys, ambiguous }): SourceLink => {
     if (excluded) {
       return { source, status: 'excluded' };
     }
     if (ambiguous) {
-      return keysLink(source, 'ambiguous', ambiguous);
+      return keysLink(source, pid, 'ambiguous', ambiguous);
     }
     if (!keys.length) {
       return { source, status: 'missing' };
@@ -281,10 +315,76 @@ export function recordLinking(metadata: EntityMetadata): RecordLinking | undefin
     return key
       ? keysLink(
           source,
+          pid,
           'linked',
           keys.filter((item) => item.key === key),
         )
-      : keysLink(source, otherwise, keys);
+      : keysLink(source, pid, otherwise, keys);
   });
   return { category, method, key, sources: links };
+}
+
+/**
+ * Search of the other records carrying the link keys of a record, which MEF doesn't link: only for
+ * a single source carrying keys that no other source of the record shares (`unshared`), as the
+ * MEF server doesn't link a key carried by several records (`get_association_record`).
+ * `undefined` when there is nothing to search.
+ */
+export function carrierSearch({ category, key, sources }: RecordLinking): CarrierSearch | undefined {
+  if (category === 'agents' || key) {
+    return undefined;
+  }
+  const unshared = sources.filter(({ status }) => status === 'unshared');
+  const link = unshared.length === 1 ? unshared[0] : undefined;
+  if (!link?.pid || !link.keys?.length) {
+    return undefined;
+  }
+  const { source, pid, keys } = link;
+  return { category, keys, sources: Object.keys(KEY_FINDERS[category]) as EntitySourceName[], source, pid };
+}
+
+/**
+ * The single record a key belongs to, as `_single_association_pid` of the MEF server: the only
+ * carrier, or else the only one carrying it as an `exactMatch` (GND states the strength of its
+ * matches). `undefined` without a single winner.
+ */
+function singleCarrier(carriers: KeyCarrier[]): KeyCarrier | undefined {
+  if (carriers.length === 1) {
+    return carriers[0];
+  }
+  const exact = carriers.filter(({ level }) => level === 'exactMatch');
+  return exact.length === 1 ? exact[0] : undefined;
+}
+
+/**
+ * Linking of a record whose `unshared` source has its link keys carried by other records, as
+ * `get_association_record` of the MEF server decides: `contested` when the keys are not the
+ * record's alone (or its single exact match), or when several records of the other source carry
+ * them without a single winner. Unchanged otherwise.
+ * @param search - Search of the carriers: the source record carrying the keys.
+ * @param pid - Pid of the MEF record.
+ */
+export function contestedLinking(
+  linking: RecordLinking,
+  search: CarrierSearch,
+  carriers: KeyCarrier[],
+  pid: string,
+): RecordLinking {
+  const marked = carriers.map((carrier) => ({
+    ...carrier,
+    current: (carrier.source === search.source && carrier.pid === search.pid) || carrier.mef?.pid === pid,
+  }));
+  const own = marked.filter(({ source }) => source === search.source);
+  const other = marked.filter(({ source }) => source !== search.source);
+  const ownConflict = own.length > 1 && !singleCarrier(own)?.current;
+  const otherConflict = other.length > 1 && !singleCarrier(other);
+  if (!ownConflict && !otherConflict) {
+    return linking;
+  }
+  return {
+    ...linking,
+    carriers: marked,
+    conflict: ownConflict ? search.source : other[0].source,
+    sources: linking.sources.map((link) => (link.status === 'unshared' ? { ...link, status: 'contested' } : link)),
+  };
 }

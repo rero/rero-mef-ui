@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { EntityMetadata } from './entity.model';
-import { RecordLinking, recordLinking } from './record-linking';
+import {
+  CarrierSearch,
+  carrierSearch,
+  contestedLinking,
+  KeyCarrier,
+  RecordLinking,
+  recordLinking,
+} from './record-linking';
 
 /** Linking of a record of a known entity type. */
 function linking(metadata: EntityMetadata): RecordLinking {
@@ -116,6 +123,8 @@ describe('recordLinking', () => {
             status: 'linked',
             field: 'pid',
             value: '130692220',
+            keys: ['130692220'],
+            pid: '130692220',
             flag: { field: 'pid', items: ['130692220'] },
           },
           {
@@ -123,6 +132,8 @@ describe('recordLinking', () => {
             status: 'linked',
             field: 'identifiedBy (GND)',
             value: '(DE-101)130692220',
+            keys: ['130692220'],
+            pid: '028907493',
             flag: { field: 'identifiedBy', items: [gndPid] },
           },
         ],
@@ -145,6 +156,8 @@ describe('recordLinking', () => {
         status: 'unshared',
         field: 'pid',
         value: '130692220',
+        keys: ['130692220'],
+        pid: '130692220',
         flag: undefined,
       });
     });
@@ -157,6 +170,9 @@ describe('recordLinking', () => {
         status: 'ambiguous',
         field: 'identifiedBy (GND)',
         value: '(DE-101)130692220, (DE-101)9',
+        keys: ['130692220', '9'],
+        pid: '028907493',
+        flag: undefined,
       });
     });
   });
@@ -179,6 +195,7 @@ describe('recordLinking', () => {
 
     it('should link the concepts by the BNF identifier of the exact matches, RERO excluded', () => {
       const exact = bnf('Other', 'FRBNF17049343');
+      const [exactId] = exact.identifiedBy;
       const result = linking(concept({ exactMatch: [exact], closeMatch: [bnf('Close', 'FRBNF22222222')] }));
       expect(result.key).toBe('FRBNF17049343');
       expect(result.sources).toEqual([
@@ -187,6 +204,8 @@ describe('recordLinking', () => {
           status: 'linked',
           field: 'identifiedBy (BNF)',
           value: 'FRBNF17049343',
+          keys: ['FRBNF17049343'],
+          pid: '19361801X',
           flag: { field: 'identifiedBy', items: [bnfId('FRBNF17049343')] },
         },
         {
@@ -194,7 +213,9 @@ describe('recordLinking', () => {
           status: 'linked',
           field: 'exactMatch (BNF)',
           value: 'FRBNF17049343',
-          flag: { field: 'exactMatch', items: [exact] },
+          keys: ['FRBNF17049343'],
+          pid: '1183616678',
+          flag: { field: 'exactMatch', items: [exactId] },
         },
         { source: 'rero', status: 'excluded' },
       ]);
@@ -214,14 +235,16 @@ describe('recordLinking', () => {
       expect(result.sources[0]).toMatchObject({ status: 'linked', value: 'FRBNF17049343' });
     });
 
-    it('should flag all the GND matches carrying the shared BNF number', () => {
+    it('should flag the BNF identifier of all the GND matches carrying the shared BNF number', () => {
       const [first, second] = [bnf('A', 'FRBNF17049343'), bnf('B', 'FRBNF17049343X')];
       expect(linking(concept({ exactMatch: [first, second] })).sources[1]).toEqual({
         source: 'gnd',
         status: 'linked',
         field: 'exactMatch (BNF)',
         value: 'FRBNF17049343, FRBNF17049343X',
-        flag: { field: 'exactMatch', items: [first, second] },
+        keys: ['FRBNF17049343'],
+        pid: '1183616678',
+        flag: { field: 'exactMatch', items: [...first.identifiedBy, ...second.identifiedBy] },
       });
     });
 
@@ -256,5 +279,74 @@ describe('recordLinking', () => {
       );
       expect(result.sources[1]).toMatchObject({ status: 'ambiguous', field: 'exactMatch (BNF)' });
     });
+  });
+});
+
+describe('carrierSearch', () => {
+  const unshared: RecordLinking = {
+    category: 'concepts',
+    method: 'BNF identifier',
+    sources: [{ source: 'gnd', status: 'unshared', value: 'FRBNF11932434', keys: ['FRBNF11932434'], pid: '041556208' }],
+  };
+
+  it('should search the records carrying the keys of a single unshared source, in the linked sources', () => {
+    expect(carrierSearch(unshared)).toEqual({
+      category: 'concepts',
+      keys: ['FRBNF11932434'],
+      sources: ['gnd', 'idref'],
+      source: 'gnd',
+      pid: '041556208',
+    });
+  });
+
+  it('should not search for a linked record, the agents, or without unshared key', () => {
+    expect(carrierSearch({ ...unshared, key: 'FRBNF11932434' })).toBeUndefined();
+    expect(carrierSearch({ ...unshared, category: 'agents' })).toBeUndefined();
+    expect(carrierSearch({ ...unshared, sources: [{ source: 'gnd', status: 'missing' }] })).toBeUndefined();
+  });
+});
+
+describe('contestedLinking', () => {
+  const key = 'FRBNF11932434';
+  const linking: RecordLinking = {
+    category: 'concepts',
+    method: 'BNF identifier',
+    sources: [
+      { source: 'idref', status: 'unshared', value: key, keys: [key], pid: '02723875X' },
+      { source: 'rero', status: 'excluded' },
+    ],
+  };
+  const search: CarrierSearch = {
+    category: 'concepts',
+    keys: [key],
+    sources: ['gnd', 'idref'],
+    source: 'idref',
+    pid: '02723875X',
+  };
+  const idref: KeyCarrier = { source: 'idref', pid: '02723875X', keys: [key] };
+  const gnd = (pid: string, level = 'closeMatch'): KeyCarrier => ({ source: 'gnd', pid, keys: [key], level });
+
+  it('should report several records of the other source without exact match as contested', () => {
+    const result = contestedLinking(linking, search, [gnd('1'), gnd('2'), idref], '14564678');
+    expect(result.sources.map(({ status }) => status)).toEqual(['contested', 'excluded']);
+    expect(result.conflict).toBe('gnd');
+    expect(result.carriers?.map(({ current }) => current)).toEqual([false, false, true]);
+  });
+
+  it('should not report a key that MEF links: single exact match, or single record of the other source', () => {
+    expect(contestedLinking(linking, search, [gnd('1', 'exactMatch'), gnd('2'), idref], '14564678')).toBe(linking);
+    expect(contestedLinking(linking, search, [gnd('1'), idref], '14564678')).toBe(linking);
+    expect(contestedLinking(linking, search, [idref], '14564678')).toBe(linking);
+  });
+
+  it('should report a key carried by several records of the own source as contested', () => {
+    const other: KeyCarrier = { ...idref, pid: '9', mef: { pid: '1', link: '/concepts/detail/1' } };
+    const result = contestedLinking(linking, search, [idref, other], '14564678');
+    expect(result.conflict).toBe('idref');
+    expect(result.carriers?.map(({ current }) => current)).toEqual([true, false]);
+  });
+
+  it('should tell the own source record by its pid, without its MEF record', () => {
+    expect(contestedLinking(linking, search, [{ ...idref, mef: undefined }], '14564678')).toBe(linking);
   });
 });

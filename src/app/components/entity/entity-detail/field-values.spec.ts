@@ -28,7 +28,77 @@ describe('fieldValues', () => {
         source: 'BNF',
         identifiedBy: [{ source: 'BNF', type: 'uri', value: 'https://data.bnf.fr/1' }],
       }),
-    ).toEqual([{ text: 'Minocycline (BNF)', url: 'https://data.bnf.fr/1' }]);
+    ).toEqual([
+      {
+        text: 'Minocycline',
+        source: 'BNF',
+        url: 'https://data.bnf.fr/1',
+      },
+    ]);
+  });
+
+  it('should flag the name of a match linked by the identifier carrying the link key (BNF ark)', () => {
+    const ark = { source: 'BNF', type: 'bf:Nbn', value: 'http://data.bnf.fr/ark:/12148/cb119324344' };
+    expect(values([{ authorized_access_point: 'X', source: 'BNF', identifiedBy: [ark] }], [ark])).toEqual([
+      { text: 'X', url: ark.value, source: 'BNF', linkKey: true },
+    ]);
+  });
+
+  it('should display the other URIs of a match, but not the one linked from its name', () => {
+    const [match] = values({
+      authorized_access_point: 'A',
+      identifiedBy: [
+        { source: 'BNF', type: 'uri', value: 'https://data.bnf.fr/1' },
+        { source: 'BNF', type: 'uri', value: 'https://catalogue.bnf.fr/1' },
+      ],
+    });
+    expect(match.url).toBe('https://data.bnf.fr/1');
+    expect(match.identifiers).toEqual([
+      { source: 'BNF', text: 'https://catalogue.bnf.fr/1', url: 'https://catalogue.bnf.fr/1' },
+    ]);
+  });
+
+  it('should display the source of a match apart from its name', () => {
+    expect(values({ authorized_access_point: 'Éducation', source: 'RVMLaval' })).toEqual([
+      { text: 'Éducation', url: undefined, source: 'RVMLaval' },
+    ]);
+  });
+
+  it('should display the other identifiers of a match, with their source', () => {
+    expect(
+      values({
+        authorized_access_point: "Certificats d'hérédité",
+        source: 'BNF',
+        identifiedBy: [
+          { source: 'BNF', type: 'uri', value: 'https://data.bnf.fr/ark:/12148/cb16778187r' },
+          { source: 'BNF', type: 'bf:Nbn', value: 'FRBNF16778187' },
+          { source: 'GND', type: 'bf:Nbn', value: '(DE-101)1221632159' },
+        ],
+      }),
+    ).toEqual([
+      {
+        text: "Certificats d'hérédité",
+        source: 'BNF',
+        url: 'https://data.bnf.fr/ark:/12148/cb16778187r',
+        identifiers: [
+          { source: 'BNF', text: 'FRBNF16778187', url: undefined },
+          { source: 'GND', text: '(DE-101)1221632159', url: undefined },
+        ],
+      },
+    ]);
+  });
+
+  it('should flag the identifier of a match carrying the link key', () => {
+    const bnf = { source: 'BNF', type: 'bf:Nbn', value: 'FRBNF16778187' };
+    const [match] = values(
+      [{ authorized_access_point: 'A', identifiedBy: [bnf, { source: 'GND', type: 'bf:Nbn', value: '(DE-101)1' }] }],
+      [bnf],
+    );
+    expect(match.linkKey).toBeUndefined();
+    expect(match.identifiers?.map(({ text, linkKey }) => ({ text, linkKey }))).toEqual([
+      { text: 'FRBNF16778187', linkKey: true },
+      { text: '(DE-101)1', linkKey: undefined },
+    ]);
   });
 
   it('should display one line per note label', () => {
@@ -75,7 +145,13 @@ describe('fieldValues', () => {
 
   it('should display an identifier as a link', () => {
     expect(values([{ source: 'IDREF', type: 'uri', value: 'http://www.idref.fr/027237850' }])).toEqual([
-      { text: 'http://www.idref.fr/027237850', url: 'http://www.idref.fr/027237850' },
+      { text: 'http://www.idref.fr/027237850', url: 'http://www.idref.fr/027237850', source: 'IDREF' },
+    ]);
+  });
+
+  it('should display the source of an identifier', () => {
+    expect(values([{ source: 'BNF', type: 'bf:Nbn', value: 'FRBNF17049343' }])).toEqual([
+      { text: 'FRBNF17049343', url: undefined, source: 'BNF' },
     ]);
   });
 

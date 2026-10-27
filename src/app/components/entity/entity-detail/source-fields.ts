@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { EntitySource, EntitySourceName } from '../entity.model';
+import { apiObjects, isObject } from '../entity.utils';
 import { LinkKeyFlag } from '../record-linking';
 import { FieldValue, fieldValues, humanize } from './field-values';
 
@@ -54,6 +55,16 @@ const ALERT_SOURCE_FIELDS = new Set(['deleted']);
 /** Source fields which value is a date, displayed with the `longDate` format. */
 const DATE_SOURCE_FIELDS = new Set(['deleted']);
 
+/** Fields of matches, whose entries without identifier are not displayed: they link to nothing. */
+const MATCH_SOURCE_FIELDS = new Set(['closeMatch', 'exactMatch']);
+
+/** Value of a source field to display: the matches without `identifiedBy` removed. */
+function displayedValue(key: string, value: unknown): unknown {
+  return MATCH_SOURCE_FIELDS.has(key) && Array.isArray(value)
+    ? value.filter((match) => isObject(match) && apiObjects(match['identifiedBy']).length > 0)
+    : value;
+}
+
 function fieldDisplay(key: string): FieldDisplay {
   const alert = ALERT_SOURCE_FIELDS.has(key);
   return {
@@ -66,7 +77,8 @@ function fieldDisplay(key: string): FieldDisplay {
 }
 
 /**
- * Displayed fields of a source record (technical and empty fields excluded), in the API order.
+ * Displayed fields of a source record (technical and empty fields, and matches without identifier
+ * excluded), in the API order.
  * @param linkKey - Items carrying the link key of the source, flagged with the LINK KEY tag.
  */
 export function sourceFields(data: EntitySource, linkKey?: LinkKeyFlag): SourceField[] {
@@ -74,7 +86,7 @@ export function sourceFields(data: EntitySource, linkKey?: LinkKeyFlag): SourceF
     .filter(([key]) => !HIDDEN_SOURCE_FIELDS.has(key))
     .map(([key, value]) => ({
       ...fieldDisplay(key),
-      values: fieldValues(value, key === linkKey?.field ? linkKey.items : []),
+      values: fieldValues(displayedValue(key, value), key === linkKey?.field ? linkKey.items : []),
     }))
     .filter((field) => field.values.length > 0);
 }
