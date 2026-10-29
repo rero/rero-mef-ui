@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -15,7 +15,6 @@ import { Header } from './components/header/header';
   templateUrl: './app.html',
   // Footer at the bottom of the window on short pages
   host: { class: 'flex min-h-screen flex-col' },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
   private readonly router = inject(Router);

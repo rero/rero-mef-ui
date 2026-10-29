@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Browser APIs missing in jsdom, used by PrimeNG components (e.g. Menubar breakpoint).
+// Browser APIs missing in jsdom, used by Optimus UI components (e.g. Menubar breakpoint).
 if (!window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -19,7 +19,7 @@ if (!window.matchMedia) {
   });
 }
 
-// Used by the PrimeNG Tabs (tab list navigators).
+// Used by the Optimus UI Tabs (tab list navigators).
 if (!window.ResizeObserver) {
   window.ResizeObserver = class {
     observe(): void {}

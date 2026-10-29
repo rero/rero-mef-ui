@@ -5,10 +5,10 @@
 
 @import 'tailwindcss';
 
-@plugin "tailwindcss-primeui";
+@plugin "@openng/optimus-ui-tailwindcss";
 
-/* Dark mode with the `app-dark` class on <html>, the same selector as PrimeNG (`darkModeSelector`
-   in app.config.ts): `dark:` utilities and PrimeNG components switch together. */
+/* Dark mode with the `app-dark` class on <html>, the same selector as Optimus UI (`darkModeSelector`
+   in app.config.ts): `dark:` utilities and Optimus UI components switch together. */
 @custom-variant dark (&:where(.app-dark, .app-dark *));
 
 @theme {
@@ -41,8 +41,8 @@
    without the `ui:` prefix used in rero-ils-ui. Kept in the base layer so that utility
    classes still win. */
 @layer base {
-  /* Dark mode values of the semantic colors, based on the PrimeNG dark palette (neutral
-     `surface`, `primary`), so that the content matches the PrimeNG components. */
+  /* Dark mode values of the semantic colors, based on the Optimus UI dark palette (neutral
+     `surface`, `primary`), so that the content matches the Optimus UI components. */
   .app-dark {
     color-scheme: dark;
     --color-page: var(--p-surface-950);
@@ -104,7 +104,7 @@
 
 /* Header navigation (app-menu): on desktop, items of the bar in white on the header blue. The
    dropdowns and the mobile panel keep the colors of the Menubar design tokens (semantic colors).
-   Not layered, so that these rules win over the PrimeNG theme (`primeng` layer). */
+   Not layered, so that these rules win over the Optimus UI theme (`optimus` layer). */
 app-menu .p-menubar:not(.p-menubar-mobile) .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content {
   color: #ffffff;
 }

@@ -6,16 +6,16 @@ import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalE
 import { provideClientHydration, withEventReplay, withNoHttpTransferCache } from '@angular/platform-browser';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideTranslateLoader, provideTranslateService, TranslateService } from '@ngx-translate/core';
-import { definePreset } from '@primeuix/themes';
+import { definePreset } from '@openng/optimus-ui-themes';
+import { provideOptimus } from '@openng/optimus-ui/config';
 import {
   CoreConfigService,
   CoreTranslateLoader,
   NgCoreTranslateService,
-  primeNGConfig,
+  optimusUIConfig,
   provideCore,
   RecordHandleErrorService,
 } from '@rero/ng-core';
-import { providePrimeNG } from 'primeng/config';
 
 import { AppConfigService } from './app-config.service';
 import { routes } from './app.routes';
@@ -30,7 +30,7 @@ import { AppRecordHandleErrorService } from './record-handle-error.service';
  * `warn` tags (RERO source) in indigo instead of orange: a third blue, next to the primary blue
  * (IdRef source, no severity) and the sky blue of `info` (GND source).
  */
-const preset = definePreset(primeNGConfig.theme?.preset ?? {}, {
+const preset = definePreset(optimusUIConfig.theme?.preset ?? {}, {
   components: {
     tag: {
       colorScheme: {
@@ -46,12 +46,12 @@ const preset = definePreset(primeNGConfig.theme?.preset ?? {}, {
  * (`darkModeSelector: false`); the same selector is used by the Tailwind `dark:` variant
  * (`@custom-variant dark` in `styles.css`).
  */
-const primeNGDarkModeConfig = {
-  ...primeNGConfig,
+const optimusUIDarkModeConfig = {
+  ...optimusUIConfig,
   theme: {
-    ...primeNGConfig.theme,
+    ...optimusUIConfig.theme,
     preset,
-    options: { ...primeNGConfig.theme?.options, darkModeSelector: '.app-dark' },
+    options: { ...optimusUIConfig.theme?.options, darkModeSelector: '.app-dark' },
   },
 };
 
@@ -74,7 +74,7 @@ export const appConfig: ApplicationConfig = {
         strictEncodingInterceptor,
       ]),
     ),
-    providePrimeNG(primeNGDarkModeConfig),
+    provideOptimus(optimusUIDarkModeConfig),
     provideBrowserGlobalErrorListeners(),
     // `withComponentInputBinding()`: route data bound to the inputs (e.g. `status` of the error page);
     // `anchorScrolling`: scrolls to the fragment (e.g. /linking#places, "On this page" links);

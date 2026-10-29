@@ -33,7 +33,7 @@ export function entityName(metadata: EntityMetadata): string | undefined {
 }
 
 /**
- * Text color of a source, as the text of its tag (CSS variable of the PrimeNG theme, light and dark
+ * Text color of a source, as the text of its tag (CSS variable of the Optimus UI theme, light and dark
  * modes), e.g. `var(--p-tag-info-color)` for GND. Sources without severity have the primary color.
  */
 export function sourceColor(source: AuthoritySource): string {

@@ -14,7 +14,7 @@ Only the rules beyond Angular defaults are listed here; they replace the `get_be
 
 ## Project
 
-Angular 21 (zoneless), pnpm 12, @rero/ng-core and PrimeNG 21, Tailwind CSS 4. Read-only client of the MEF REST API
+Angular 22 (zoneless), pnpm 12, @rero/ng-core and Optimus UI 2, Tailwind CSS 4. Read-only client of the MEF REST API
 (see README.md).
 
 ## TypeScript style

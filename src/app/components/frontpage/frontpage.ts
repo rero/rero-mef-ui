@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { ButtonDirective } from '@openng/optimus-ui/button';
 import { RecordService } from '@rero/ng-core';
-import { ButtonDirective } from 'primeng/button';
 import { map } from 'rxjs';
 
 import { EntityIcon } from '../entity/entity-icon/entity-icon';
@@ -22,7 +22,6 @@ interface EntityAggregationResult {
   selector: 'app-frontpage',
   imports: [DecimalPipe, NgOptimizedImage, RouterLink, ButtonDirective, EntityIcon, EntitySources],
   templateUrl: './frontpage.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Frontpage {
   private readonly recordService = inject(RecordService);

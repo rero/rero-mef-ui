@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type { Tag } from '@openng/optimus-ui/tag';
 import { Links, RecordData } from '@rero/ng-core';
-import type { Tag } from 'primeng/tag';
 
 /**
  * Main entity types, each one with its own API index (e.g. `/api/agents/mef/`): key, plural title

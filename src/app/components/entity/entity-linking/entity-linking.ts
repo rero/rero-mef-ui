@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { Tag } from 'primeng/tag';
+import { Tag } from '@openng/optimus-ui/tag';
 
 import { SOURCE_LABELS, SOURCE_TAG_SEVERITY } from '../entity.model';
 import { carrierSearch, contestedLinking, LinkStatus, RecordLinking, SourceLink } from '../record-linking';
@@ -112,7 +112,6 @@ export function linkingSummary({ category, method, hub, key, sources, carriers, 
   imports: [NgTemplateOutlet, RouterLink, Tag],
   templateUrl: './entity-linking.html',
   host: { class: 'block' },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityLinking {
   private readonly keyCarriers = inject(KeyCarriersService);

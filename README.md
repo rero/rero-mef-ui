@@ -23,10 +23,10 @@ The data comes from the REST API of the [rero-mef](https://github.com/rero/rero-
 
 ## Tech stack
 
-- [Angular](https://angular.dev) 21 (standalone components, signals, zoneless change detection, server-side
+- [Angular](https://angular.dev) 22 (standalone components, signals, zoneless change detection, server-side
   rendering)
-- [@rero/ng-core](https://github.com/rero/ng-core): search, detail view, translations and PrimeNG theme
-- [PrimeNG](https://primeng.org) 21 with the ng-core preset
+- [@rero/ng-core](https://github.com/rero/ng-core): search, detail view, translations and Optimus UI theme
+- [Optimus UI](https://www.openng.org/) 2 with the ng-core preset
 - [Tailwind CSS](https://tailwindcss.com) 4
 - [Vitest](https://vitest.dev) for the unit tests
 - [pnpm](https://pnpm.io) as package manager
@@ -91,7 +91,7 @@ set `API_URL` with `pnpm start`.
 ```
 src/
 ├── app/
-│   ├── app.config.ts          # Application providers (ng-core, PrimeNG, translations, HTTP, router)
+│   ├── app.config.ts          # Application providers (ng-core, Optimus UI, translations, HTTP, router)
 │   ├── app.config.server.ts   # Additional providers on the server
 │   ├── app.routes.server.ts   # Rendering mode of the routes on the server
 │   ├── app.routes.ts          # Routes and search configuration of the record types
@@ -105,7 +105,7 @@ src/
 │   │   ├── header/            # Header: large on the home page, compact on the other pages
 │   │   ├── home-search/       # Search field of the home page
 │   │   ├── linking/           # "How MEF linking works" page
-│   │   ├── menu/              # Header navigation (PrimeNG Menubar)
+│   │   ├── menu/              # Header navigation (Optimus UI Menubar)
 │   │   └── theme-switch/      # Color theme selector of the header
 │   └── interceptors/          # HTTP interceptors (date range facets, no browser cache, page status)
 ├── environments/              # Configuration per environment
@@ -173,9 +173,6 @@ results and the detail views, then hydrated in the browser.
 - **Deployment**: `pnpm build` generates the browser files (`dist/mef-ui/browser`) and the server
   (`dist/mef-ui/server/server.mjs`), run with Node.js 24 (`PORT` environment variable, 4000 by default; `API_URL`,
   see [Configuration](#configuration)).
-- **ng-core patch** (`patches/@rero__ng-core.patch`, applied by pnpm): two ng-core 21.3.0 lines break the server
-  rendering: `RecordSearchResultComponent` reads `window.location.href`, and `easymde` (markdown editor) is
-  imported statically, while CodeMirror needs the DOM as soon as it is loaded. To remove once fixed in ng-core.
 
 ## Docker
 
@@ -217,14 +214,14 @@ search, facets, pagination...) are blocked by CORS, as `http://localhost:4000` i
   and used as utilities: `bg-surface`, `bg-surface-muted`, `border-line`, `text-ink`, `text-ink-muted`,
   `text-heading`, `text-link`, `text-danger`... The MEF blue (`mef-blue`) is used by the header, in both
   themes.
-- **Dark mode**: the `app-dark` class on `<html>` enables the dark theme, for PrimeNG (`darkModeSelector`
-  in `app.config.ts`) and for Tailwind (`dark:` variant). The semantic colors take the PrimeNG dark palette
+- **Dark mode**: the `app-dark` class on `<html>` enables the dark theme, for Optimus UI (`darkModeSelector`
+  in `app.config.ts`) and for Tailwind (`dark:` variant). The semantic colors take the Optimus UI dark palette
   values. The mode is chosen in the header (`ThemeService`) and applied before Angular starts by a script of
   `index.html`, to avoid a flash of the light theme.
-- **ng-core and PrimeNG**: the ng-core utility classes (`core:...`) are loaded through `angular.json`, after
-  `styles.css`. PrimeNG uses the ng-core preset (`primeNGConfig`), whose CSS layers let the Tailwind utilities
-  override the PrimeNG component styles. Customize PrimeNG components with their design tokens (`[dt]`) or
-  pass-through classes (`[pt]`).
+- **ng-core and Optimus UI**: the ng-core utility classes (`core:...`) are loaded through `angular.json`, after
+  `styles.css`. Optimus UI uses the ng-core preset (`optimusUIConfig`), whose CSS layers let the Tailwind
+  utilities override the Optimus UI component styles. Customize Optimus UI components with their design tokens
+  (`[dt]`) or pass-through classes (`[pt]`).
 - **Accessibility**: the pages must pass the AXE checks and follow the WCAG AA rules (contrast, focus, ARIA).
 
 ## Code conventions
@@ -252,7 +249,18 @@ search, facets, pagination...) are blocked by CORS, as `http://localhost:4000` i
 ## Continuous integration
 
 The GitHub Actions workflow (`.github/workflows/ci.yml`) checks the formatting, runs the unit tests and
-builds the application, on each push to `staging` and each pull request.
+builds the application, on each push to `staging` and each pull request. It fails when a file is not formatted.
+
+It tests against the ng-core given in `.ng-core-ref`: `published` (the npm version), a branch of rero/ng-core, or
+`owner/ng-core@branch`. The workflow then builds and installs that ng-core.
+
+To build locally against an unpublished ng-core, pack it (`pnpm run pack` in `../ng-core`), add an override to
+`pnpm-workspace.yaml` and run `pnpm install`. Do not commit this override:
+
+```yaml
+overrides:
+  '@rero/ng-core': 'file:../ng-core/rero-ng-core-X.X.X.tgz'
+```
 
 ## AI assistants
 

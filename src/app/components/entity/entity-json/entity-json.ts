@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { Dialog } from '@openng/optimus-ui/dialog';
 import { RecordService } from '@rero/ng-core';
-import { Dialog } from 'primeng/dialog';
 
 import { JsonTree } from '../../json-tree/json-tree';
 
@@ -17,7 +17,6 @@ import { JsonTree } from '../../json-tree/json-tree';
   selector: 'app-entity-json',
   imports: [Dialog, JsonTree],
   templateUrl: './entity-json.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityJson {
   private readonly recordService = inject(RecordService);

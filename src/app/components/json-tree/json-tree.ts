@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input } from '@angular/core';
-import { Button } from 'primeng/button';
+import { Component, computed, ElementRef, inject, input } from '@angular/core';
+import { Button } from '@openng/optimus-ui/button';
 
 import { jsonNode } from './json-node';
 
@@ -16,7 +16,6 @@ import { jsonNode } from './json-node';
   imports: [Button, NgTemplateOutlet],
   templateUrl: './json-tree.html',
   host: { class: 'block' },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class JsonTree {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);

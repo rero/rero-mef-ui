@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 
 import { ThemeMode, ThemeService } from '../../theme.service';
 
@@ -31,7 +31,6 @@ const OPTIONS: ThemeOption[] = [
     '(focusout)': 'onFocusOut($event)',
     '(keydown.escape)': 'collapse(true)',
   },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeSwitch {
   private readonly theme = inject(ThemeService);

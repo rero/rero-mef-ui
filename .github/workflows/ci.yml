@@ -26,6 +26,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # ng-core to test against, from .ng-core-ref: `published` (the npm version),
+      # a branch of rero/ng-core, or owner/ng-core@branch-or-sha
+      - name: Read ng-core ref
+        id: ng_core
+        run: |
+          VALUE=$(grep -v '^#' .ng-core-ref 2>/dev/null | tr -d '[:space:]')
+          VALUE=${VALUE:-published}
+          if [ "$VALUE" = "published" ]; then
+            echo "local=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "local=true" >> "$GITHUB_OUTPUT"
+            if [[ "$VALUE" == *"@"* ]]; then
+              echo "repository=${VALUE%@*}" >> "$GITHUB_OUTPUT"
+              echo "ref=${VALUE#*@}" >> "$GITHUB_OUTPUT"
+            else
+              echo "repository=rero/ng-core" >> "$GITHUB_OUTPUT"
+              echo "ref=$VALUE" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
       # pnpm version from the `packageManager` field of package.json
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -39,8 +59,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Before the ng-core checkout, which Prettier would also check
       - name: Check formatting
         run: pnpm format:check
+
+      - name: Checkout ng-core
+        if: steps.ng_core.outputs.local == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.ng_core.outputs.repository }}
+          ref: ${{ steps.ng_core.outputs.ref }}
+          path: ng-core
+          persist-credentials: false
+
+      # Install the pack rather than the dist directory, which would resolve
+      # Angular from ng-core/node_modules and load it twice.
+      - name: Build and install the ng-core ref
+        if: steps.ng_core.outputs.local == 'true'
+        run: |
+          (cd ng-core && pnpm install --frozen-lockfile && pnpm run pack)
+          pnpm add ./ng-core/rero-ng-core-*.tgz
 
       - name: Unit tests
         run: pnpm test --watch=false

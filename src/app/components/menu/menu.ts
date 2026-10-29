@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
-import { MenuItem } from 'primeng/api';
-import { Menubar } from 'primeng/menubar';
+import { Component, viewChild } from '@angular/core';
+import { MenuItem } from '@openng/optimus-ui/api';
+import { Menubar } from '@openng/optimus-ui/menubar';
 
 import { ENTITY_CATEGORIES } from '../entity/entity.model';
 
@@ -16,12 +16,11 @@ const ITEM_COLOR = 'var(--color-heading)';
 /** Background of the dropdown items on hover / focus, as the icon badges of the home page. */
 const ITEM_HOVER_BACKGROUND = 'var(--color-surface-accent)';
 
-/** Main navigation of the header, built with the PrimeNG Menubar. */
+/** Main navigation of the header, built with the Optimus UI Menubar. */
 @Component({
   selector: 'app-menu',
   imports: [Menubar],
   templateUrl: './menu.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Menu {
   private readonly menubar = viewChild.required(Menubar);
@@ -72,7 +71,7 @@ export class Menu {
   };
 
   /**
-   * Opens the submenus on mouse over on desktop. PrimeNG only does it after a first click
+   * Opens the submenus on mouse over on desktop. Optimus UI only does it after a first click
    * (`dirty` flag); on mobile (`queryMatches`), the menu keeps opening on click.
    */
   protected openOnHover(): void {

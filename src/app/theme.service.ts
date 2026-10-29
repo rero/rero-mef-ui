@@ -10,7 +10,7 @@ export type ThemeMode = 'auto' | 'light' | 'dark';
 /** Storage key of the chosen mode, also read by the inline script of `index.html`. */
 const STORAGE_KEY = 'mef-theme';
 
-/** Class of the `<html>` element enabling the dark mode (PrimeNG and Tailwind `dark:`). */
+/** Class of the `<html>` element enabling the dark mode (Optimus UI and Tailwind `dark:`). */
 const DARK_CLASS = 'app-dark';
 
 function isThemeMode(value: unknown): value is ThemeMode {
