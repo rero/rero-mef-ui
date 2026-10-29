@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 import { ENTITY_TYPES, EntityType } from '../entity.model';
 
@@ -16,7 +16,6 @@ import { ENTITY_TYPES, EntityType } from '../entity.model';
   imports: [DatePipe],
   templateUrl: './entity-type.html',
   host: { class: 'block' },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityTypeLabel {
   readonly type = input.required<EntityType>();

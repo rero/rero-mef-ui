@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { inject } from '@angular/core';
-import { ActivatedRouteSnapshot, Route, Router, Routes, UrlSegment } from '@angular/router';
-import { Bucket, DetailComponent, RecordSearchPageComponent, RecordType, typeResolver } from '@rero/ng-core';
+import { Route, Router, Routes, UrlSegment } from '@angular/router';
+import { Bucket, ngCoreRoutes, RecordType } from '@rero/ng-core';
 import { Observable, of } from 'rxjs';
 
 import { EntityBrief } from './components/entity/entity-brief/entity-brief';
@@ -119,20 +119,9 @@ const recordTypes: Partial<RecordType>[] = [
   })),
 ];
 
-/** Record types of the closest parent route (`inheritTypesResolver` of ng-core, not exported). */
-function inheritTypes(route: ActivatedRouteSnapshot): Partial<RecordType>[] {
-  for (let parent = route.parent; parent; parent = parent.parent) {
-    if (parent.data['types']) {
-      return parent.data['types'];
-    }
-  }
-  return [];
-}
-
 /**
- * Search and detail routes of ng-core (`ngCoreRoutes`), without the editor ones (`:type/new`,
- * `:type/edit/:pid`): MEF is read only, and the editor dependencies (formly, CodeMirror, KaTeX...)
- * would be included in the bundle.
+ * Search and detail routes of ng-core (`ngCoreRoutes`): MEF is read only, so the editor routes of
+ * `@rero/ng-core/editor` are left out.
  */
 const recordRoutes: Routes = [
   // The entity types are hidden types without facets (detail view only): their search, e.g.
@@ -145,13 +134,7 @@ const recordRoutes: Routes = [
     redirectTo: ({ params: { type }, queryParams }) =>
       inject(Router).createUrlTree(['/mef'], { queryParams: { ...queryParams, entity: type } }),
   },
-  { path: ':type', title: typeResolver, component: RecordSearchPageComponent },
-  {
-    path: ':type/detail/:pid',
-    title: typeResolver,
-    component: DetailComponent,
-    resolve: { types: inheritTypes },
-  },
+  ...ngCoreRoutes,
 ];
 
 export const routes: Routes = [

@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@openng/optimus-ui/tabs';
+import { Tag } from '@openng/optimus-ui/tag';
 import { ApiService, DetailComponent } from '@rero/ng-core';
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
-import { Tag } from 'primeng/tag';
 
 import { Error } from '../../error/error';
 import { EntityField } from '../entity-field/entity-field';
@@ -41,7 +41,6 @@ import { comparisonLayout, comparisonRows, sourceFields, SourceSection } from '.
     NgTemplateOutlet,
   ],
   templateUrl: './entity-detail.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityDetail {
   private readonly apiService = inject(ApiService);

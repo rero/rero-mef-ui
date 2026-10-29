@@ -1,13 +1,13 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Button } from 'primeng/button';
-import { InputGroup } from 'primeng/inputgroup';
-import { InputGroupAddon } from 'primeng/inputgroupaddon';
-import { InputText } from 'primeng/inputtext';
+import { Button } from '@openng/optimus-ui/button';
+import { InputGroup } from '@openng/optimus-ui/inputgroup';
+import { InputGroupAddon } from '@openng/optimus-ui/inputgroupaddon';
+import { InputText } from '@openng/optimus-ui/inputtext';
 
 /**
  * Search field of the home page: opens the MEF search (brief view) with the query, e.g.
@@ -17,7 +17,6 @@ import { InputText } from 'primeng/inputtext';
   selector: 'app-home-search',
   imports: [ReactiveFormsModule, Button, InputGroup, InputGroupAddon, InputText],
   templateUrl: './home-search.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeSearch {
   private readonly router = inject(Router);
@@ -26,7 +25,7 @@ export class HomeSearch {
 
   /**
    * RERO+ blue button: white text with a sufficient contrast (WCAG AA) on the header blue. In dark
-   * mode, the colors of the other PrimeNG buttons (light primary blue, dark text).
+   * mode, the colors of the other Optimus UI buttons (light primary blue, dark text).
    */
   protected readonly buttonPt = {
     root: {

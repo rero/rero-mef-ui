@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, RESPONSE_INIT } from '@angular/core';
+import { Component, computed, effect, inject, input, RESPONSE_INIT } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonDirective } from 'primeng/button';
+import { ButtonDirective } from '@openng/optimus-ui/button';
 
 import { errorLabel, errorText } from './error-text';
 
@@ -41,7 +41,6 @@ import { errorLabel, errorText } from './error-text';
       </div>
     </section>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Error {
   /** HTTP status code of the error, `0` without response from the server. */

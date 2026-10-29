@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from '@openng/optimus-ui/accordion';
 import { EsResult, RecordService } from '@rero/ng-core';
-import { Accordion, AccordionContent, AccordionHeader, AccordionPanel } from 'primeng/accordion';
 import { map } from 'rxjs';
 
 import { EntityMetadata } from '../entity.model';
@@ -16,7 +16,7 @@ const MAX_RESULTS = 20;
 
 /**
  * `relation_pid` of a source record: pid of the related record, with the direction of the
- * redirect, in a PrimeNG accordion. When its panel is expanded, the MEF records of this pid are
+ * redirect, in an Optimus UI accordion. When its panel is expanded, the MEF records of this pid are
  * searched in the index of the entity type (e.g. `agents/mef/?q=gnd.pid:003050076`), as the
  * `all/mef` index only has `$ref` links.
  */
@@ -24,7 +24,6 @@ const MAX_RESULTS = 20;
   selector: 'app-entity-relation',
   imports: [Accordion, AccordionContent, AccordionHeader, AccordionPanel, RouterLink],
   templateUrl: './entity-relation.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityRelation {
   private readonly recordService = inject(RecordService);
@@ -41,7 +40,7 @@ export class EntityRelation {
   /**
    * Compact accordion pass-through, displayed as a field value: no header padding, background or
    * border, and the toggle icon before the pid (`flex-row-reverse`). Tailwind utilities override
-   * PrimeNG styles (`primeng` CSS layer below `utilities`).
+   * Optimus UI styles (`optimus` CSS layer below `utilities`).
    */
   protected readonly accordionPt = {
     panel: { root: { class: 'border-0' } },

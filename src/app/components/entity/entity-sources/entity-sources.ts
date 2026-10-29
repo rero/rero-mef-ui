@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { Tag } from 'primeng/tag';
+import { Component, input } from '@angular/core';
+import { Tag } from '@openng/optimus-ui/tag';
 
 import { AuthoritySource, SOURCE_LABELS, SOURCE_TAG_SEVERITY } from '../entity.model';
 
@@ -12,7 +12,6 @@ import { AuthoritySource, SOURCE_LABELS, SOURCE_TAG_SEVERITY } from '../entity.m
   imports: [Tag],
   templateUrl: './entity-sources.html',
   host: { class: 'block' },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntitySources {
   readonly sources = input.required<readonly AuthoritySource[]>();

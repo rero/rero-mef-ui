@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 import { ENTITY_CATEGORIES, ENTITY_TYPES, EntityCategory, EntityType } from '../entity.model';
 import { entityTypeLabel } from '../entity.utils';
@@ -15,7 +15,6 @@ import { entityTypeLabel } from '../entity.utils';
   selector: 'app-entity-icon',
   templateUrl: './entity-icon.html',
   host: { class: 'block shrink-0', 'aria-hidden': 'true' },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityIcon {
   /** Entity type: search results, detail view. */

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 /**
  * Label / value row of the entity detail view, used on a `<div>` of a `<dl>` (the only valid
@@ -18,6 +18,5 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   host: {
     class: 'grid gap-x-6 gap-y-0.5 border-t border-line py-2.5 first:border-t-0 sm:grid-cols-[13rem_minmax(0,1fr)]',
   },
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityField {}

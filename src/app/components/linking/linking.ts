@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonDirective } from 'primeng/button';
-import { Tag } from 'primeng/tag';
+import { ButtonDirective } from '@openng/optimus-ui/button';
+import { Tag } from '@openng/optimus-ui/tag';
 
 import { AuthoritySource, ENTITY_CATEGORIES, SOURCE_LABELS, SOURCE_TAG_SEVERITY } from '../entity/entity.model';
 
@@ -25,7 +25,6 @@ function source(key: AuthoritySource, url?: string): Source {
   imports: [NgTemplateOutlet, RouterLink, ButtonDirective, Tag],
   templateUrl: './linking.html',
   styleUrl: './linking.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Linking {
   /** Source tags, linked to the source websites. */

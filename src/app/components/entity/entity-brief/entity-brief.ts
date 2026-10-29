@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DetailUrl, ResultItem } from '@rero/ng-core';
 
@@ -17,7 +17,6 @@ import { entityDetailLink, entityName } from '../entity.utils';
   selector: 'app-entity-brief',
   imports: [DatePipe, EntityIcon, EntitySources, EntityTypeLabel, RouterLink],
   templateUrl: './entity-brief.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityBrief implements ResultItem<EntityRecord> {
   readonly record = input.required<EntityRecord>();

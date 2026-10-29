@@ -3,7 +3,7 @@
 
 import { NgOptimizedImage } from '@angular/common';
 import { httpResource } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ApiService } from '@rero/ng-core';
 
 import { version } from '../../../../package.json';
@@ -23,7 +23,6 @@ export function release(repository: string, version: string): { label: string; u
   selector: 'app-footer',
   imports: [NgOptimizedImage],
   templateUrl: './footer.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Footer {
   private readonly endpoint = inject(ApiService).getEndpointByType('version', true);

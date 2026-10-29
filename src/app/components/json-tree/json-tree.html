@@ -11,8 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
           class="fa-solid fa-caret-right w-4 text-ink-muted transition-transform [details[open]>summary>&]:rotate-90"
           aria-hidden="true"></i>
         @if (node.key !== undefined) {
-          <span class="font-semibold text-heading">{{ node.key }}</span
-          >:
+          <span class="font-semibold text-heading">{{ node.key }}</span>:
         }
         {{ node.open }}
         <!-- Collapsed: closing bracket and number of children -->
@@ -30,8 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   } @else {
     <div class="pl-4">
       @if (node.key !== undefined) {
-        <span class="font-semibold text-heading">{{ node.key }}</span
-        >:
+        <span class="font-semibold text-heading">{{ node.key }}</span>:
       }
       @if (node.url) {
         <a [href]="node.url" target="_blank" rel="noopener">

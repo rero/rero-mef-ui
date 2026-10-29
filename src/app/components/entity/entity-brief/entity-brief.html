@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   <!-- Duplicate of the title link, for the mouse only: hidden from screen readers and keyboard. -->
   @if (url?.link) {
     @if (url?.external) {
-      <a [href]="url?.link" class="shrink-0" tabindex="-1" aria-hidden="true">
+      <a [href]="url.link" class="shrink-0" tabindex="-1" aria-hidden="true">
         <app-entity-icon [type]="metadata.type" [deleted]="deleted" />
       </a>
     } @else {
@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <h3 [id]="titleId()" class="mb-1.5 text-lg leading-snug font-semibold break-words sm:text-xl">
       @if (url?.link) {
         @if (url?.external) {
-          <a [href]="url?.link" class="text-heading hover:underline focus:underline">
+          <a [href]="url.link" class="text-heading hover:underline focus:underline">
             {{ name() }}
           </a>
         } @else {
