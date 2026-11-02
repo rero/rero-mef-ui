@@ -1,0 +1,88 @@
+# SPDX-FileCopyrightText: Fondation RERO+
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Cuts a release with semantic-release. Run it from `staging` (our active
+# branch) once the CI is green there: it reads the conventional commits since
+# the last tag, computes the next version, updates the version and the
+# changelog, commits, tags and publishes a GitHub Release on `staging`, then
+# fast-forwards `master` to that commit.
+
+name: Release
+
+on:
+  workflow_dispatch:
+
+# Every write goes through the GitHub App token, not GITHUB_TOKEN
+permissions:
+  contents: read
+  checks: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+    concurrency: release
+    timeout-minutes: 15
+    steps:
+      # Never tag a commit whose build failed or is still running
+      - name: Check the CI of the release commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CONCLUSION=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-runs?check_name=build" \
+            --jq '.check_runs[0].conclusion')
+          if [ "$CONCLUSION" != "success" ]; then
+            echo "::error::the CI build of ${GITHUB_SHA} is '${CONCLUSION:-missing}', not 'success'"; exit 1
+          fi
+
+      - name: Generate a token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false # semantic-release pushes with GH_TOKEN, master is pushed below
+
+      # pnpm version from the `packageManager` field of package.json
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run semantic-release
+        id: release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # A late plugin failure (e.g. commenting on issues) must not hide a
+          # release already tagged: record the outcome first, fail afterwards.
+          STATUS=0
+          pnpm release || STATUS=$?
+
+          # A release was made if HEAD now points exactly at a version tag.
+          if git describe --tags --exact-match --match 'v[0-9]*' HEAD 2>/dev/null; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit "$STATUS"
+
+      - name: Fast-forward master to the release commit
+        if: ${{ !cancelled() && steps.release.outputs.released == 'true' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:master

@@ -254,6 +254,16 @@ search, facets, pagination...) are blocked by CORS, as `http://localhost:4000` i
 The GitHub Actions workflow (`.github/workflows/ci.yml`) checks the formatting, runs the unit tests and
 builds the application, on each push to `staging` and each pull request.
 
+## Release
+
+The _Release_ workflow (`.github/workflows/release.yml`) is started by hand from the Actions tab, on `staging`,
+once its CI is green. [semantic-release](https://semantic-release.gitbook.io/) computes the next version from
+the conventional commits since the last tag, updates `package.json` and `CHANGELOG.md`, tags the commit,
+publishes a GitHub Release, then fast-forwards `master` to it.
+
+The major version follows the Angular one, as in rero-ils-ui: a breaking change only bumps the minor version.
+The versions start from the `v21.0.0` tag, to push once on `staging` before the first release.
+
 ## AI assistants
 
 - `.claude/CLAUDE.md`: project instructions (Angular best practices, accessibility).
