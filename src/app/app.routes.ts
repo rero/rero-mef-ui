@@ -49,9 +49,11 @@ const recordTypes: Partial<RecordType>[] = [
     sortOptions: [
       {
         label: 'Relevance',
-        // `-`: descending `_score` (most relevant first), as the backend default sort
+        // `-`: descending `_score` (most relevant first), as the backend default sort. Also the
+        // default without query (browse links, empty search), instead of the backend `date_changed`.
         value: '-relevance',
         defaultQuery: true,
+        defaultNoQuery: true,
         icon: 'fa-solid fa-arrow-down-wide-short',
       },
       {
@@ -67,13 +69,11 @@ const recordTypes: Partial<RecordType>[] = [
       {
         label: 'Date changed (oldest first)',
         value: 'date_changed',
-        defaultNoQuery: true,
         icon: 'fa-solid fa-arrow-down-short-wide',
       },
       {
         label: 'Date changed (newest first)',
         value: '-date_changed',
-        defaultNoQuery: true,
         icon: 'fa-solid fa-arrow-down-wide-short',
       },
       {
