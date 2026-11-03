@@ -12,8 +12,6 @@ permissions:
 
 jobs:
   assign-author:
-    # Only members and collaborators can be assigned: skip external contributors
-    if: contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/auto-assign-action@0a2c53d3721e4c5cfcce6afd4014aecc337979f6 # v2.0.2
