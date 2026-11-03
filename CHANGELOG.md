@@ -1,5 +1,11 @@
 # Changelog
 
+## [21.0.1](https://github.com/rero/rero-mef-ui/compare/v21.0.0...v21.0.1) (2026-11-03)
+
+### Bug Fixes
+
+* **search:** sort by relevance without query ([27d1f0a](https://github.com/rero/rero-mef-ui/commit/27d1f0a8d44933f971ae35207fa334d0b1e8f8d4))
+
 ## 21.0.0 (2026-11-03)
 
 ### Features
