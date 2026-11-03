@@ -1,5 +1,11 @@
 # Changelog
 
+## [21.1.0](https://github.com/rero/rero-mef-ui/compare/v21.0.1...v21.1.0) (2026-11-03)
+
+### Features
+
+* **footer:** show the UI and backend versions ([98cd174](https://github.com/rero/rero-mef-ui/commit/98cd174ff8762fd78a2db306fa8674aa94572dd8))
+
 ## [21.0.1](https://github.com/rero/rero-mef-ui/compare/v21.0.0...v21.0.1) (2026-11-03)
 
 ### Bug Fixes
