@@ -100,7 +100,7 @@ src/
 │   │   ├── entity/            # Entities: search result (entity-brief), detail view (entity-detail),
 │   │   │                      # shared components (icon, type, sources, field), model and utils
 │   │   ├── error/             # Error page (404)
-│   │   ├── footer/            # Footer: RERO+ brand and links
+│   │   ├── footer/            # Footer: RERO+ brand, links and versions (application and backend)
 │   │   ├── frontpage/         # Home page
 │   │   ├── header/            # Header: large on the home page, compact on the other pages
 │   │   ├── home-search/       # Search field of the home page
