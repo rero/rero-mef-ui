@@ -43,4 +43,11 @@ describe('Error', () => {
     await fixture.whenStable();
     expect(response.status).toBe(404);
   });
+
+  it('should give the 503 status to the server response when the API did not answer', async () => {
+    const response: ResponseInit = { status: 200 };
+    const fixture = create(0, [{ provide: RESPONSE_INIT, useValue: response }]);
+    await fixture.whenStable();
+    expect(response.status).toBe(503);
+  });
 });

@@ -20,6 +20,7 @@ import {
 import { AppConfigService } from './app-config.service';
 import { routes } from './app.routes';
 import { apiTransferCacheInterceptor } from './interceptors/api-transfer-cache.interceptor';
+import { apiUnavailableInterceptor } from './interceptors/api-unavailable.interceptor';
 import { dateRangeAggregationInterceptor } from './interceptors/date-range-aggregation.interceptor';
 import { noCacheInterceptor } from './interceptors/no-cache.interceptor';
 import { responseStatusInterceptor } from './interceptors/response-status.interceptor';
@@ -68,6 +69,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([
         apiTransferCacheInterceptor,
+        apiUnavailableInterceptor,
         dateRangeAggregationInterceptor,
         noCacheInterceptor,
         responseStatusInterceptor,

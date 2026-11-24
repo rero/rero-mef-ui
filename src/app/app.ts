@@ -4,20 +4,24 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { ButtonDirective } from '@openng/optimus-ui/button';
 import { filter, map } from 'rxjs';
 
+import { ApiStatus } from './api-status.service';
+import { Error } from './components/error/error';
 import { Footer } from './components/footer/footer';
 import { Header } from './components/header/header';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Header],
+  imports: [RouterOutlet, ButtonDirective, Error, Footer, Header],
   templateUrl: './app.html',
   // Footer at the bottom of the window on short pages
   host: { class: 'flex min-h-screen flex-col' },
 })
 export class App {
   private readonly router = inject(Router);
+  protected readonly apiStatus = inject(ApiStatus);
 
   /** Current URL, without query string and fragment. */
   private readonly path = toSignal(

@@ -5,7 +5,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 <app-header [large]="isHome()" />
 
 <main class="container mx-auto w-full flex-1 px-4 text-ink">
-  <router-outlet />
+  <!-- Error page instead of the current one while the API is unavailable (`ApiStatus`) -->
+  <!-- `!== null`: the status `0` (no response) is falsy -->
+  @let unavailableStatus = apiStatus.unavailableStatus();
+  @if (unavailableStatus !== null) {
+    <app-error [status]="unavailableStatus">
+      <button pButton type="button" (click)="apiStatus.retry()">
+        <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+        Try again
+      </button>
+    </app-error>
+  } @else {
+    <router-outlet />
+  }
 </main>
 
 <app-footer />

@@ -9,8 +9,9 @@ import { errorLabel, errorText } from './error-text';
 
 /**
  * Error page, with links to go on browsing: page of the unknown routes (inputs bound to the route
- * data) and error of the detail view. The texts depend on the HTTP status; `title` and
- * `description` replace them for a more specific message.
+ * data), error of the detail view and of an unavailable API. The texts depend on the HTTP status;
+ * `title` and `description` replace them for a more specific message. The projected content adds
+ * actions before the links.
  */
 @Component({
   selector: 'app-error',
@@ -30,6 +31,8 @@ import { errorLabel, errorText } from './error-text';
       </h1>
       <p class="mb-8 text-lg text-ink-muted">{{ description() ?? text().description }}</p>
       <div class="flex flex-wrap justify-center gap-3">
+        <!-- Additional actions, e.g. retry when the API is unavailable -->
+        <ng-content />
         <a pButton routerLink="/">
           <i class="fa-solid fa-house" aria-hidden="true"></i>
           Back to home
@@ -52,15 +55,11 @@ export class Error {
   protected readonly label = computed(() => errorLabel(this.status()));
 
   constructor() {
-    // Server rendering: HTTP status of the response, so that the search engines don't index the page
+    // Server rendering: HTTP status of the response, so that the search engines don't index the page;
+    // `503` when the API did not answer (`0`)
     const response = inject(RESPONSE_INIT, { optional: true });
     if (response) {
-      effect(() => {
-        const status = this.status();
-        if (status > 0) {
-          response.status = status;
-        }
-      });
+      effect(() => (response.status = this.status() || 503));
     }
   }
 }
