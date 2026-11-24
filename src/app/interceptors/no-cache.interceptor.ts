@@ -14,7 +14,7 @@ import { isApiGet } from './api-request';
  * With `no-store`, the browser never sends a conditional request.
  * Can be removed when the API `ETag` takes the resolved sources into account.
  *
- * Requires the fetch backend (`withFetch()`): the XHR backend ignores the `cache` option.
+ * Requires the fetch backend, the default one: the XHR backend (`withXhr()`) ignores the `cache` option.
  */
 export const noCacheInterceptor: HttpInterceptorFn = (req, next) =>
   next(isApiGet(req) ? req.clone({ cache: 'no-store' }) : req);

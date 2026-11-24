@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: Fondation RERO+
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideClientHydration, withEventReplay, withNoHttpTransferCache } from '@angular/platform-browser';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
@@ -63,9 +63,8 @@ export const appConfig: ApplicationConfig = {
     provideTranslateService({ loader: provideTranslateLoader(CoreTranslateLoader) }),
     { provide: TranslateService, useExisting: NgCoreTranslateService },
     provideAppInitializer(() => inject(NgCoreTranslateService).use(inject(CoreConfigService).defaultLanguage)),
-    // `withFetch()`: required by `noCacheInterceptor` (`cache` option of the requests)
+    // Fetch backend (default): required by `noCacheInterceptor` (`cache` option of the requests)
     provideHttpClient(
-      withFetch(),
       withInterceptors([
         apiTransferCacheInterceptor,
         dateRangeAggregationInterceptor,
