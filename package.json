@@ -14,17 +14,17 @@
     "release": "semantic-release"
   },
   "private": true,
-  "packageManager": "pnpm@12.21.0",
+  "packageManager": "pnpm@12.23.0",
   "dependencies": {
-    "@angular/cdk": "^22.2.7",
-    "@angular/common": "^22.2.6",
-    "@angular/compiler": "^22.2.6",
-    "@angular/core": "^22.2.6",
-    "@angular/forms": "^22.2.6",
-    "@angular/platform-browser": "^22.2.6",
-    "@angular/platform-server": "^22.2.6",
-    "@angular/router": "^22.2.6",
-    "@angular/ssr": "^22.2.7",
+    "@angular/cdk": "^22.3.0",
+    "@angular/common": "^22.3.0",
+    "@angular/compiler": "^22.3.0",
+    "@angular/core": "^22.3.0",
+    "@angular/forms": "^22.3.0",
+    "@angular/platform-browser": "^22.3.0",
+    "@angular/platform-server": "^22.3.0",
+    "@angular/router": "^22.3.0",
+    "@angular/ssr": "^22.3.0",
     "@fortawesome/fontawesome-free": "^7.3.1",
     "@ngrx/signals": "^22.0.1",
     "@ngx-translate/core": "^18.1.0",
@@ -37,9 +37,9 @@
     "tslib": "^2.9.1"
   },
   "devDependencies": {
-    "@angular/build": "^22.2.7",
-    "@angular/cli": "^22.2.7",
-    "@angular/compiler-cli": "^22.2.6",
+    "@angular/build": "^22.3.0",
+    "@angular/cli": "^22.3.0",
+    "@angular/compiler-cli": "^22.3.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@openng/optimus-ui-tailwindcss": "^2.0.2",
     "@semantic-release/changelog": "^7.0.0",
@@ -55,6 +55,6 @@
     "semantic-release": "^25.0.9",
     "tailwindcss": "^4.3.5",
     "typescript": "~6.0.3",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }
