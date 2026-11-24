@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "https://mef.test.rero.ch",
+    "target": "https://mef.copy.rero.ch",
     "secure": true,
     "changeOrigin": true,
     "autoRewrite": true,

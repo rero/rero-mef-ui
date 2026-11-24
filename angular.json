@@ -33,7 +33,7 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": ["mef.rero.ch", "mef.test.rero.ch"]
+              "allowedHosts": ["mef.rero.ch", "mef.copy.rero.ch"]
             },
             "ssr": {
               "entry": "src/server.ts"

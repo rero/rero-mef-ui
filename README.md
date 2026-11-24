@@ -46,7 +46,7 @@ pnpm start
 Then open <http://localhost:4200/>.
 
 In development, the API calls (`/api/...`) go through the Angular dev server proxy (`proxy.conf.json`) to
-the test server **https://mef.test.rero.ch**, so no local backend is needed (production:
+the test server **https://mef.copy.rero.ch**, so no local backend is needed (production:
 https://mef.rero.ch). The proxy is required because the MEF servers don't send CORS headers: the browser
 can't call them directly from `localhost`. To use a local rero-mef instance, change the `target` of
 `proxy.conf.json`.
@@ -74,14 +74,14 @@ server (`pnpm serve:ssr`) sets `apiBaseUrl` and `$refPrefix` when it starts, and
 browser with the page (`RuntimeConfig`, `src/app/runtime-config.ts`). Without it, the values below apply.
 
 ```sh
-API_URL=https://mef.test.rero.ch node dist/mef-ui/server/server.mjs   # test server
+API_URL=https://mef.copy.rero.ch node dist/mef-ui/server/server.mjs   # test server
 API_URL=https://mef.rero.ch node dist/mef-ui/server/server.mjs        # production server
 ```
 
 | Key          | Development                | Production            | Usage                                               |
 | ------------ | -------------------------- | --------------------- | --------------------------------------------------- |
 | `apiBaseUrl` | `''` (relative URLs)       | `https://mef.rero.ch` | Base URL of the API calls made by the application   |
-| `$refPrefix` | `https://mef.test.rero.ch` | `https://mef.rero.ch` | Absolute URL of the records (links to the raw JSON) |
+| `$refPrefix` | `https://mef.copy.rero.ch` | `https://mef.rero.ch` | Absolute URL of the records (links to the raw JSON) |
 
 `apiBaseUrl` must stay empty in development, otherwise the API calls bypass the proxy and are blocked by CORS: don't
 set `API_URL` with `pnpm start`.
@@ -161,7 +161,7 @@ results and the detail views, then hydrated in the browser.
 - **Browser APIs**: `window`, `document`, `localStorage`... don't exist on the server. Inject `DOCUMENT` and test
   `defaultView` (see `ThemeService`), or run the code in `afterNextRender()`.
 - **Allowed hosts**: the server only renders the requests whose `Host` header is listed in `security.allowedHosts`
-  of `angular.json` (`mef.rero.ch`, `mef.test.rero.ch`), to prevent SSRF attacks. Add a host with the
+  of `angular.json` (`mef.rero.ch`, `mef.copy.rero.ch`), to prevent SSRF attacks. Add a host with the
   `NG_ALLOWED_HOSTS` environment variable (comma separated); `pnpm serve:ssr:local` allows `localhost`, to
   check the server rendering of the production build locally. The browser calls of this build go to
   `https://mef.rero.ch` and are blocked by CORS (new search, facets...): use `pnpm start` to test the application.
@@ -182,7 +182,7 @@ runs as the `node` user, behind `tini`, which forwards the stop signals.
 
 ```sh
 docker build -f docker/Dockerfile -t mef-ui .
-docker run -d -p 4000:4000 -e API_URL=https://mef.test.rero.ch mef-ui
+docker run -d -p 4000:4000 -e API_URL=https://mef.copy.rero.ch mef-ui
 ```
 
 The configuration is passed with environment variables, the same image runs on the test and production servers:
@@ -201,7 +201,7 @@ rendering nor API call. The build context is filtered by `docker/Dockerfile.dock
 To test the image locally, allow `localhost`:
 
 ```sh
-docker run --rm -p 4000:4000 -e API_URL=https://mef.test.rero.ch -e NG_ALLOWED_HOSTS=localhost mef-ui
+docker run --rm -p 4000:4000 -e API_URL=https://mef.copy.rero.ch -e NG_ALLOWED_HOSTS=localhost mef-ui
 ```
 
 The pages are rendered by the server with the data of `API_URL`, but the later calls of the browser to the API (new

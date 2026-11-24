@@ -5,6 +5,6 @@ export const environment = {
   production: false,
   projectTitle: 'MEF (dev)',
   apiBaseUrl: '',
-  $refPrefix: 'https://mef.test.rero.ch',
+  $refPrefix: 'https://mef.copy.rero.ch',
   translationsURLs: [] as string[],
 };

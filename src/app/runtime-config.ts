@@ -10,7 +10,7 @@ import { makeStateKey } from '@angular/core';
  * browser with the page (`TransferState`).
  */
 export interface RuntimeConfig {
-  /** Base URL of the MEF API (e.g. `https://mef.test.rero.ch`): `API_URL` environment variable. */
+  /** Base URL of the MEF API (e.g. `https://mef.copy.rero.ch`): `API_URL` environment variable. */
   apiUrl?: string;
 }
 

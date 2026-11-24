@@ -38,7 +38,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD wget -q -O /dev/null "http://127.0.0.1:${PORT}/favicon.ico" || exit 1
 
 # Configuration (environment variables, see README.md):
-# - API_URL: base URL of the MEF API, e.g. https://mef.test.rero.ch (default: https://mef.rero.ch)
+# - API_URL: base URL of the MEF API, e.g. https://mef.copy.rero.ch (default: https://mef.rero.ch)
 # - NG_ALLOWED_HOSTS: additional host names allowed to be rendered, comma separated
 # - PORT: listening port (default: 4000)
 ENTRYPOINT ["/sbin/tini", "--"]

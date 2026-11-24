@@ -8,7 +8,7 @@ import { environment } from '../environments/environment';
 import { AppConfigService } from './app-config.service';
 import { RUNTIME_CONFIG_KEY } from './runtime-config';
 
-const API_URL = 'https://mef.test.rero.ch';
+const API_URL = 'https://mef.copy.rero.ch';
 
 describe('AppConfigService', () => {
   it('should use the API URL of the server and pass it on to the browser', () => {
